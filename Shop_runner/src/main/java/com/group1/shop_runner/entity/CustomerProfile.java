@@ -1,6 +1,7 @@
 package com.group1.shop_runner.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,8 @@ public class CustomerProfile {
     @Column(name = "address", length = 500)
     private String address;
 
+    @Column(name = "dob")
+    @Past
     private LocalDate dob;
 
     @Column(name = "phone_number", length = 20)

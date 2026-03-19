@@ -1,6 +1,7 @@
 package com.group1.shop_runner.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,7 @@ public class ProductVariant {
 
     // FK product_id
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id",nullable = false)
     private Product product;
 
     @Column(name = "option1_value", length = 50)
@@ -34,11 +35,16 @@ public class ProductVariant {
     @Column(name = "option3_value", length = 50)
     private String option3Value;
 
+    @Column(name = "price",nullable = false)
+    @Min(0)
     private BigDecimal price;
 
-    @Column(name = "compare_price")
+    @Column(name = "compare_price",nullable = false)
+    @Min(0)
     private BigDecimal comparePrice;
 
+    @Column(name = "stock",nullable = false)
+    @Min(0)
     private Integer stock;
 
     @Column(length = 100)

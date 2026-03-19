@@ -1,6 +1,7 @@
 package com.group1.shop_runner.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -22,19 +23,20 @@ public class Order {
 
     // FK user_id
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price",nullable = false)
+    @Min(0)
     private BigDecimal totalPrice;
 
-    @Column(length = 20)
+    @Column(name = "status", length = 20,nullable = false)
     private String status;
 
-    @Column(name = "shipping_address", length = 500)
+    @Column(name = "shipping_address", length = 500,nullable = false)
     private String shippingAddress;
 
-    @Column(name = "phone_number", length = 20)
+    @Column(name = "phone_number", length = 20,nullable = false)
     private String phoneNumber;
 
     @Column(name = "created_at")

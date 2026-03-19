@@ -19,10 +19,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", length = 200)
+    @Column(name = "name", length = 200,nullable = false)
     private String name;
 
-    @Column(name = "slug", length = 300, unique = true)
+    @Column(name = "slug", length = 300, unique = true,nullable = false)
     private String slug;
 
     @Column(name = "description")
@@ -32,10 +32,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
-
-    // FK discount_id (bảng này chưa tạo entity → tạm để Integer)
-    @Column(name = "discount_id")
-    private Integer discountId; // tạm để Integer
 
     @Column(name = "option1_name", length = 50)
     private String option1Name;

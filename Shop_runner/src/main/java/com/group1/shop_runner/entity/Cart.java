@@ -20,7 +20,7 @@ public class Cart {
     private Integer id;
 
     // FK user_id
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 

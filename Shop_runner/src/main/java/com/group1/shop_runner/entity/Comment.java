@@ -21,15 +21,15 @@ public class Comment {
 
     // FK user_id
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
     // FK product_id
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id",nullable = false)
     private Product product;
 
-    @Column(length = 500)
+    @Column(name = "content", length = 500,nullable = false)
     private String content;
 
     @Column(name = "created_at")
