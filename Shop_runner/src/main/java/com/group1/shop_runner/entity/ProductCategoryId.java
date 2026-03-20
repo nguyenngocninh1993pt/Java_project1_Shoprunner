@@ -7,7 +7,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class ProductCategoryId implements Serializable {
-    private Integer product;
-    private Integer category;
+    private Long product;
+    private Long category;
 }
