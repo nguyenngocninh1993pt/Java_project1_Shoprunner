@@ -1,0 +1,90 @@
+/* Khung tổng */
+.navbar-wrapper {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: black;
+  color: white;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideDown 0.6s ease-out forwards;
+}
+
+/* Hiệu ứng trượt xuống */
+@keyframes slideDown {
+  0% {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Bố cục bên trong */
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo */
+.navbar-logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-decoration: none;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+
+.navbar-logo:hover {
+  opacity: 0.8; /* nhẹ thôi, không đổi màu */
+}
+
+/* Liên kết */
+.navbar-links {
+  display: flex;
+  gap: 28px;
+}
+
+.navlink {
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.95rem;
+  position: relative;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navlink:hover {
+  color: white;
+  transform: translateY(-2px);
+}
+
+.navlink::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: white;
+  transition: width 0.3s ease;
+}
+
+.navlink:hover::after {
+  width: 100%;
+}
+
+/* Link đang active */
+.navlink.active {
+  color: white;
+}
+
+.navlink.active::after {
+  width: 100%;
+}

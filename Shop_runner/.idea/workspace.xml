@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="dc594f91-8fe2-4004-a1ba-fb523489c1d1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/Asm4.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/src/asm4/BankAccount.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/src/asm4/CheckingAccount.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/src/asm4/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/src/asm4/SavingAccount.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../Asm4/src/asm4/VipAccount.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shop_runner_step4_entity_design_final.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/ShopRunnerApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Brand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Cart.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/CartItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Category.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Comment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/CustomerProfile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Order.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/OrderItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Post.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Product.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/ProductCategory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/ProductCategoryId.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/ProductImage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/ProductVariant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/Role.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/group1/shop_runner/entity/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-mysql.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-sqlserver.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/group1/shop_runner/ShopRunnerApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../database.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../LuyenTap/src/bai5_string/java/string/bai3_lamlai.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../LuyenTap/src/bai5_string/java/string/java_baitapvandung1.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../LuyenTap/src/bai5_string/java/string/java_baitapvandung2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/.idea/fileColors.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/Demo.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/file (2).acsm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/java.acsm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../T2507E_APTECH/src" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm6/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm6/Phone.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm6/PhoneBook.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm6/PhoneNumber.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm7/BonusEligible.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm7/Developer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm7/Employee.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm7/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm7/Manager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../asm7/Tester.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../demo (1)/Java_demo/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../demo (1)/Java_final/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../demo (1)/Java_final/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../demo (1)/Java_final/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../demo (1)/Java_final/src/Product.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;nguyenngocninh1993pt&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/nguyenngocninh1993pt/Java_Aptech.git&quot;,
+    &quot;accountId&quot;: &quot;76d567ad-6d67-46f5-b0e6-72ef8bbcfea1&quot;
+  }
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="3B0mUbrCxnhDhLugId7jvh5ksUa" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ShopRunnerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Workspace/Java/Java_2/Java_springboot/Project_Shoprunner/Shop_runner&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;advanced.settings&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Workspace\Java\Java_2\Java_springboot\Project_Shoprunner\Shop_runner\src\main\resources" />
+      <recent name="C:\Workspace\Java\Java_2\Java_springboot\Shop_runner\src\main\java\com\group1\shop_runner\domain" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Shop_runner" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Shop_runner" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="dc594f91-8fe2-4004-a1ba-fb523489c1d1" name="Changes" comment="" />
+      <created>1773634378789</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1773634378789</updated>
+    </task>
+    <servers />
+  </component>
+</project>
