@@ -5,6 +5,7 @@ import com.group1.shop_runner.dto.product.request.ProductVariantRequest;
 import com.group1.shop_runner.entity.Product;
 import com.group1.shop_runner.entity.ProductVariant;
 import com.group1.shop_runner.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,28 +34,28 @@ public class ProductController {
         return productService.getVariantsByProduct(id);
     }
 
-    // Thêm 1 sản phẩm từ client:
+    // Thêm 1 Product từ client:
     @PostMapping
-    public Product createProduct(@RequestBody ProductRequest request){
+    public Product createProduct(@Valid @RequestBody ProductRequest request){
         return productService.createProduct(request);
     }
 
-    // Thêm variants từ client:
+    // Thêm Variants từ client:
     @PostMapping("/variants")
-    public ProductVariant createVariant(@RequestBody ProductVariantRequest request) {
+    public ProductVariant createVariant(@Valid @RequestBody ProductVariantRequest request) {
         return productService.createVariant(request);
     }
 
     // Update product:
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody ProductRequest request){
+    public Product updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request){
         return productService.updateProduct(id, request);
     }
 
     // Update variant:
     @PutMapping("/variants/{id}")
     public ProductVariant updateVariant(@PathVariable Long id,
-                                        @RequestBody ProductVariantRequest request){
+                                        @Valid @RequestBody ProductVariantRequest request){
         return productService.updateVariant(id, request);
     }
 
