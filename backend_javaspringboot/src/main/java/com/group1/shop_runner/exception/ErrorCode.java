@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     PRODUCT_NOT_FOUND("3002", "Product not found", HttpStatus.NOT_FOUND),
+    CART_NOT_FOUND("3003", "Cart not found", HttpStatus.NOT_FOUND),
+    CART_IS_EMPTY("3004", "Cart is empty", HttpStatus.NOT_FOUND),
+    OUT_OF_STOCK("3004", "Out of stock", HttpStatus.NOT_FOUND),
     INVALID_INPUT("1000", "Invalid input", HttpStatus.BAD_REQUEST),
     INTERNAL_ERROR("9999", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
 
