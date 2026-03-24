@@ -1,5 +1,6 @@
 package com.group1.shop_runner.importdata.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,9 @@ public class ApiVariant {
     private String option3;
 
     private BigDecimal price;
-    private BigDecimal compared_price;
-    private Integer inventory_quantity;
+    @JsonProperty("compared_price")
+    private BigDecimal compareAtPrice;
+    @JsonProperty("inventory_quantity")
+    private Integer inventoryQuantity;
     private String sku;
 }
