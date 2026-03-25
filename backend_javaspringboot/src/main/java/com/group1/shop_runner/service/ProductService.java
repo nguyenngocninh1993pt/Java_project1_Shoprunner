@@ -2,17 +2,28 @@ package com.group1.shop_runner.service;
 
 import com.group1.shop_runner.dto.product.request.ProductRequest;
 import com.group1.shop_runner.dto.product.request.ProductVariantRequest;
+import com.group1.shop_runner.dto.product.response.CategoryDto;
+import com.group1.shop_runner.dto.product.response.ProductImageDto;
+import com.group1.shop_runner.dto.product.response.ProductResponse;
+import com.group1.shop_runner.dto.product.response.ProductVariantDto;
 import com.group1.shop_runner.entity.Product;
 import com.group1.shop_runner.entity.ProductVariant;
 import com.group1.shop_runner.exception.AppException;
 import com.group1.shop_runner.exception.ErrorCode;
+import com.group1.shop_runner.repository.CategoryRepository;
+import com.group1.shop_runner.repository.ProductImageRepository;
 import com.group1.shop_runner.repository.ProductRepository;
 import com.group1.shop_runner.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 
 @Service
 public class ProductService {
@@ -21,6 +32,12 @@ public class ProductService {
 
     @Autowired
     private ProductVariantRepository productVariantRepository;
+
+    @Autowired
+    private ProductImageRepository productImageRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // 1. Service: Lấy danh sách toàn bộ sản phẩm:
     public List<Product> getAllProducts(){
@@ -32,9 +49,37 @@ public class ProductService {
         return productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
-    // 3. Service: Lấy Variant theo Product:
-    public List<ProductVariant> getVariantsByProduct(Long productId){
-        return productVariantRepository.findByProductId(productId);
+    // 3. Service: Lấy Product details
+    public List<ProductResponse> getAllProductDetail(int page) {
+
+        Pageable pageable = PageRequest.of(page, 50); // 👈 fix cứng 50
+
+        List<ProductResponse> products = productRepository.getProducts(pageable).getContent();
+
+        List<Long> ids = products.stream()
+                .map(ProductResponse::getId)
+                .toList();
+
+        var images = productImageRepository.getImagesByProductIds(ids);
+        var variants = productVariantRepository.getVariantsByProductIds(ids);
+        var categories = categoryRepository.getByProductIds(ids);
+
+        Map<Long, List<ProductImageDto>> imageMap =
+                images.stream().collect(Collectors.groupingBy(ProductImageDto::getProductId));
+
+        Map<Long, List<ProductVariantDto>> variantMap =
+                variants.stream().collect(Collectors.groupingBy(ProductVariantDto::getProductId));
+
+        Map<Long, List<CategoryDto>> categoryMap =
+                categories.stream().collect(Collectors.groupingBy(CategoryDto::getProductId));
+
+        for (ProductResponse p : products) {
+            p.setImages(imageMap.getOrDefault(p.getId(), List.of()));
+            p.setVariants(variantMap.getOrDefault(p.getId(), List.of()));
+            p.setCategories(categoryMap.getOrDefault(p.getId(), List.of()));
+        }
+
+        return products;
     }
 
     // 4. Service: Thêm sản phẩm từ client:

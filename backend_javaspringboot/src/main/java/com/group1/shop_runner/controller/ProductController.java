@@ -2,6 +2,8 @@ package com.group1.shop_runner.controller;
 
 import com.group1.shop_runner.dto.product.request.ProductRequest;
 import com.group1.shop_runner.dto.product.request.ProductVariantRequest;
+import com.group1.shop_runner.dto.product.response.ProductListResponse;
+import com.group1.shop_runner.dto.product.response.ProductResponse;
 import com.group1.shop_runner.entity.Product;
 import com.group1.shop_runner.entity.ProductVariant;
 import com.group1.shop_runner.service.ProductService;
@@ -21,6 +23,14 @@ public class ProductController {
     public List<Product> getAll(){
         return productService.getAllProducts();
     }
+    //Lay san pham day du detail
+    @GetMapping("/detail")
+    public ProductListResponse getAllProductDetail(
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        List<ProductResponse> products = productService.getAllProductDetail(page);
+        return new ProductListResponse(products);
+    }
 
     // Lấy 1 sản phẩm theo id:
     @GetMapping("/{id}")
@@ -29,10 +39,10 @@ public class ProductController {
     }
 
     // Lấy Variant theo Product:
-    @GetMapping("/{id}/variants")
-    public List<ProductVariant> getVariantsByProduct(@PathVariable Long id){
-        return productService.getVariantsByProduct(id);
-    }
+//    @GetMapping("/{id}/variants")
+//    public List<ProductVariantDto> getVariantsByProduct(@PathVariable Long id){
+//        return productService.getVariantsByProduct(id);
+//    }
 
     // Thêm 1 Product từ client:
     @PostMapping
