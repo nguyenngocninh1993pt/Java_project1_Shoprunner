@@ -43,8 +43,8 @@ function Footer() {
           <ul className="footer-links">
             <li><Link to="/">Trang chủ</Link></li>
             <li><Link to="/products">Sản phẩm</Link></li>
-            <li><a href="#">Giới thiệu</a></li>
-            <li><a href="#">Liên hệ</a></li>
+            <li><Link to="/aboutus">Giới thiệu</Link></li>
+            <li><Link to="/contact">Liên hệ</Link></li>
           </ul>
         </div>
 
