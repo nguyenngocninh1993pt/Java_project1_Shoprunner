@@ -52,7 +52,7 @@ public class ProductService {
                         "Product not found with id = " + request.getProductId()
                 ));
         ProductVariant variant = new ProductVariant();
-        variant.setProduct(product);
+        variant.setProduct(product);// set fk (product_id)
         variant.setOption1Value(request.getOption1Value());
         variant.setOption2Value(request.getOption2Value());
         variant.setPrice(request.getPrice());

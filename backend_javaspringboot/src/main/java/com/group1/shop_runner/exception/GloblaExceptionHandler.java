@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GloblaExceptionHandler {
 
-    // Bắc lỗi xử lý riêng api:
+    // Bắt lỗi xử lý riêng api:
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiError> handleException(AppException ex){
         ErrorCode errorCode = ex.getErrorCode();
