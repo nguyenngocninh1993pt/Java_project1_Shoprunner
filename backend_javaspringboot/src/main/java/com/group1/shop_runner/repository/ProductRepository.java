@@ -1,5 +1,6 @@
 package com.group1.shop_runner.repository;
 
+import com.group1.shop_runner.dto.product.response.ProductListResponse;
 import com.group1.shop_runner.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 

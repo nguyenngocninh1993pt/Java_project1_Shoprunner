@@ -22,4 +22,8 @@ public class ProductVariantRequest {
 
     @NotNull(message = "Information is required")
     private Integer stock;
+
+    public String getOption3Value() {
+        return getOption3Value();
+    }
 }

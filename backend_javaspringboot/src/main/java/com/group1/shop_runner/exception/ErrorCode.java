@@ -5,12 +5,13 @@ import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
 
-    PRODUCT_NOT_FOUND("3002", "Product not found", HttpStatus.NOT_FOUND),
+    PRODUCT_NOT_FOUND("3001", "Product not found", HttpStatus.NOT_FOUND),
+    VARIANT_NOT_FOUND("3002", "Variant not found", HttpStatus.NOT_FOUND),
     CART_NOT_FOUND("3003", "Cart not found", HttpStatus.NOT_FOUND),
     CART_IS_EMPTY("3004", "Cart is empty", HttpStatus.NOT_FOUND),
-    OUT_OF_STOCK("3004", "Out of stock", HttpStatus.NOT_FOUND),
+    OUT_OF_STOCK("3005", "Out of stock", HttpStatus.NOT_FOUND),
     INVALID_INPUT("1000", "Invalid input", HttpStatus.BAD_REQUEST),
-    INTERNAL_ERROR("9999", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+    INTERNAL_ERROR("9999", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR), CART_ITEM_NOT_FOUND("3006", "CartItem Not found", HttpStatus.NOT_FOUND ), USER_NOT_FOUND("3006", "User not found", HttpStatus.NOT_FOUND ), PRODUCT_IMAGE_NOT_FOUND("3007","Product image not found" , HttpStatus.NOT_FOUND ), CATEGORY_NOT_FOUND("3008", "Category not found", HttpStatus.NOT_FOUND ), CATEGORY_NAME_ALREADY_EXISTS("3009", "Category already exists",HttpStatus.BAD_REQUEST );
 
     private final String code;
     private final String message;
