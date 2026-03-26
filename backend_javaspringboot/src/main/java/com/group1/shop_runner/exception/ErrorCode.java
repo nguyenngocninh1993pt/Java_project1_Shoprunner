@@ -11,7 +11,8 @@ public enum ErrorCode {
     CART_IS_EMPTY("3004", "Cart is empty", HttpStatus.NOT_FOUND),
     OUT_OF_STOCK("3005", "Out of stock", HttpStatus.NOT_FOUND),
     INVALID_INPUT("1000", "Invalid input", HttpStatus.BAD_REQUEST),
-    INTERNAL_ERROR("9999", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR), CART_ITEM_NOT_FOUND("3006", "CartItem Not found", HttpStatus.NOT_FOUND ), USER_NOT_FOUND("3006", "User not found", HttpStatus.NOT_FOUND ), PRODUCT_IMAGE_NOT_FOUND("3007","Product image not found" , HttpStatus.NOT_FOUND ), CATEGORY_NOT_FOUND("3008", "Category not found", HttpStatus.NOT_FOUND ), CATEGORY_NAME_ALREADY_EXISTS("3009", "Category already exists",HttpStatus.BAD_REQUEST );
+    INTERNAL_ERROR("9999", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR), CART_ITEM_NOT_FOUND("3006", "CartItem Not found", HttpStatus.NOT_FOUND ), USER_NOT_FOUND("3006", "User not found", HttpStatus.NOT_FOUND ), PRODUCT_IMAGE_NOT_FOUND("3007","Product image not found" , HttpStatus.NOT_FOUND ), CATEGORY_NOT_FOUND("3008", "Category not found", HttpStatus.NOT_FOUND ), CATEGORY_NAME_ALREADY_EXISTS("3009", "Category already exists",HttpStatus.BAD_REQUEST ), PRODUCT_CATEGORY_ALREADY_EXISTS("1001", "Product category already exists", HttpStatus.BAD_REQUEST ), PRODUCT_CATEGORY_NOT_FOUND("1002", "Product category not found", HttpStatus.NOT_FOUND ),
+    ORDER_NOT_FOUND("3010", "Order not found", HttpStatus.NOT_FOUND);
 
     private final String code;
     private final String message;

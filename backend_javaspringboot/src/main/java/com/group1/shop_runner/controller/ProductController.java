@@ -119,4 +119,15 @@ public class ProductController {
         productService.deleteVariant(id);
         return "Delete variant successfully";
     }
+    // =========================================================
+    // API 10: GET /api/products/category/{categoryId}
+    // Mục đích:
+    // - Lấy danh sách product theo category
+    // - Trả về kiểu ProductListResponse để hiển thị ngoài trang list
+    // =========================================================
+    @GetMapping("/category/{categoryId}")
+    public List<ProductListResponse> getProductsByCategory(@PathVariable Long categoryId) {
+        return productService.getProductsByCategory(categoryId);
+    }
+
 }

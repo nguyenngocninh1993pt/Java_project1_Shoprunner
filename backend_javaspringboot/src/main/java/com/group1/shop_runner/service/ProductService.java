@@ -15,6 +15,8 @@ import com.group1.shop_runner.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.group1.shop_runner.entity.ProductCategory;
+import com.group1.shop_runner.repository.ProductCategoryRepository;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -28,6 +30,9 @@ public class ProductService {
 
     @Autowired
     private ProductVariantRepository productVariantRepository;
+
+    @Autowired
+    private ProductCategoryRepository productCategoryRepository;
 
     // =========================================================
     // API 1: GET /api/products
@@ -176,6 +181,23 @@ public class ProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.VARIANT_NOT_FOUND));
 
         productVariantRepository.delete(variant);
+    }
+
+    // =========================================================
+    // API 10: GET /api/products/category/{categoryId}
+    // Mục đích:
+    // - Lấy danh sách product theo category
+    // - Trả về kiểu ProductListResponse để hiển thị ngoài trang list
+    // =========================================================
+    @Transactional(readOnly = true)
+    public List<ProductListResponse> getProductsByCategory(Long categoryId) {
+        List<ProductCategory> productCategories = productCategoryRepository.findByCategory_Id(categoryId);
+
+        return productCategories.stream()
+                .map(ProductCategory::getProduct)
+                .distinct()
+                .map(this::mapToProductListResponse)
+                .toList();
     }
 
     // =========================================================
