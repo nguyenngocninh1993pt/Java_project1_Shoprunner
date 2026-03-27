@@ -23,7 +23,22 @@ public class ProductController {
     public List<Product> getAll(){
         return productService.getAllProducts();
     }
-    //Lay san pham day du detail
+    // Lấy 1 sản phẩm theo id:
+    @GetMapping("/{id}")
+    public Product getProductById(@PathVariable Long id){
+        return productService.getProductById(id);
+    }
+    //Lay 1 san pham detail theo id
+    @GetMapping("/detail/{id}")
+    public ProductResponse getProductDetail(@PathVariable Long id) {
+        return productService.getProductDetail(id);
+    }
+    //lay nhieu san pham detail theo id
+    @GetMapping("/by-ids")
+    public List<ProductResponse> getProductsByIds(@RequestParam List<Long> ids) {
+        return productService.getProductsByIds(ids);
+    }
+    //Lay tat ca san pham detail
     @GetMapping("/detail")
     public ProductListResponse getAllProductDetail(
             @RequestParam(defaultValue = "0") int page
@@ -32,11 +47,7 @@ public class ProductController {
         return new ProductListResponse(products);
     }
 
-    // Lấy 1 sản phẩm theo id:
-    @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id){
-        return productService.getProductById(id);
-    }
+
 
     // Lấy Variant theo Product:
 //    @GetMapping("/{id}/variants")
