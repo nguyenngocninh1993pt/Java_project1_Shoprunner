@@ -1,14 +1,27 @@
 package com.group1.shop_runner.exception;
 
-public class AppException extends RuntimeException{
+public class AppException extends RuntimeException {
 
-    private ErrorCode errorCode;
-    public AppException(ErrorCode errorCode){
+    private final ErrorCode errorCode;
+    private final String customMessage;
+
+    public AppException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
+        this.customMessage = errorCode.getMessage();
+    }
+
+    public AppException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+        this.customMessage = message;
     }
 
     public ErrorCode getErrorCode() {
         return errorCode;
+    }
+
+    public String getCustomMessage() {
+        return customMessage;
     }
 }

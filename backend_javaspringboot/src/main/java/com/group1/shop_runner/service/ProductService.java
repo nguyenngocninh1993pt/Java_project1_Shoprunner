@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -48,11 +49,57 @@ public class ProductService {
     public Product getProductById(Long id){
         return productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
     }
+    // 3.1 Service: Lay 1 thong tin chi tiet san pham theo id
+    public ProductResponse getProductDetail(Long id) {
 
-    // 3. Service: Lấy Product details
+        return getProductsByIds(List.of(id))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+    // 3.2 Service: Lay nhieu thong tin chi tiet san pham theo list id
+    public List<ProductResponse> getProductsByIds(List<Long> ids) {
+
+        List<ProductResponse> products = productRepository.getProductsByIds(ids);
+        Set<Long> foundIds = products.stream()
+                .map(ProductResponse::getId)
+                .collect(Collectors.toSet());
+
+        List<Long> missingIds = ids.stream()
+                .filter(id -> !foundIds.contains(id))
+                .toList();
+
+        if (!missingIds.isEmpty()) {
+            throw new AppException(
+                    ErrorCode.PRODUCT_NOT_FOUND,
+                    "Product not found with ids: " + missingIds
+            );
+        }
+        var images = productImageRepository.getImagesByProductIds(ids);
+        var variants = productVariantRepository.getVariantsByProductIds(ids);
+        var categories = categoryRepository.getByProductIds(ids);
+
+        Map<Long, List<ProductImageDto>> imageMap =
+                images.stream().collect(Collectors.groupingBy(ProductImageDto::getProductId));
+
+        Map<Long, List<ProductVariantDto>> variantMap =
+                variants.stream().collect(Collectors.groupingBy(ProductVariantDto::getProductId));
+
+        Map<Long, List<CategoryDto>> categoryMap =
+                categories.stream().collect(Collectors.groupingBy(CategoryDto::getProductId));
+
+        for (ProductResponse p : products) {
+            p.setImages(imageMap.getOrDefault(p.getId(), List.of()));
+            p.setVariants(variantMap.getOrDefault(p.getId(), List.of()));
+            p.setCategories(categoryMap.getOrDefault(p.getId(), List.of()));
+        }
+
+        return products;
+    }
+    // 3.3 Service: Lấy All Product details
     public List<ProductResponse> getAllProductDetail(int page) {
 
-        Pageable pageable = PageRequest.of(page, 50); // 👈 fix cứng 50
+        Pageable pageable = PageRequest.of(page, 50);
 
         List<ProductResponse> products = productRepository.getProducts(pageable).getContent();
 

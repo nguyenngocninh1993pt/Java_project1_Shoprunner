@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySlug(String slug);
+    List<ProductResponse> getProductsByIds(List<Long> ids);
 
     @Query("""
                 SELECT new com.group1.shop_runner.dto.product.response.ProductResponse(
