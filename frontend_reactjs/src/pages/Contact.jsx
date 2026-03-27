@@ -7,7 +7,7 @@ function Contact() {
     {
       icon: MapPin,
       title: "Địa chỉ cửa hàng",
-      content: "Số 123, Đường Lê Duẩn, Quận 1, TP. Hồ Chí Minh",
+      content: "Tòa nhà FPT Polytechnic, 13 Trịnh Văn Bô, Nam Từ Liêm, Hà Nội",
     },
     {
       icon: Phone,
