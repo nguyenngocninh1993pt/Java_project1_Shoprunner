@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/brands")
+@RequestMapping("/api/v1/brands")
 @CrossOrigin(origins = "*")
 public class BrandController {
 
@@ -17,7 +17,7 @@ public class BrandController {
 
     // =========================================================
     // API 1: Lấy tất cả brand
-    // GET /api/brands
+    // GET /api/v1/brands
     // =========================================================
     @GetMapping
     public List<BrandResponse> getAllBrands() {
@@ -26,7 +26,7 @@ public class BrandController {
 
     // =========================================================
     // API 2: Lấy brand theo id
-    // GET /api/brands/{id}
+    // GET /api/v1/brands/{id}
     // =========================================================
     @GetMapping("/{id}")
     public BrandResponse getBrandById(@PathVariable Long id) {
