@@ -210,3 +210,122 @@
   color: black;
   border-color: white;
 }
+/* Phải có position: relative để badge canh theo icon */
+.action-icon-link {
+  position: relative; 
+  color: #d1d5db;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -7px;      /* Điều chỉnh tùy theo độ cao bạn muốn */
+  right: -9px;    /* Điều chỉnh để lệch sang phải icon */
+  background-color: #ff4d4f; /* Màu đỏ nổi bật */
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 4px;
+  border: 2px solid #000; /* Tạo viền đen để nổi bật trên nền tối */
+  pointer-events: none;
+}   
+/* --- THÊM VÀO CUỐI FILE NAVBAR.CSS --- */
+
+/* Container bọc User và Dropdown */
+.user-logged-in {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #d1d5db;
+  transition: color 0.3s ease;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Dropdown Menu */
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #111;
+  min-width: 160px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  padding: 8px 0;
+  margin-top: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+/* Hiển thị dropdown khi hover */
+.user-logged-in:hover .user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Items bên trong dropdown */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #222;
+  color: white;
+}
+
+/* Riêng nút đăng xuất */
+.logout-btn {
+  color: #ff4d4f; /* Màu đỏ cảnh báo */
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 5px;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 77, 79, 0.1);
+  color: #ff4d4f;
+}
+
+/* Hiệu ứng hover cho User Info */
+.user-logged-in:hover .user-info {
+  color: white;
+}

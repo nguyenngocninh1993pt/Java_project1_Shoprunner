@@ -12,7 +12,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import Policy from "./pages/Policy";
-
+import Login from "./pages/Login";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 function App() {
   return (
     <CartProvider>
@@ -30,7 +31,8 @@ function App() {
           <Route path="/chinh-sach-doi-tra" element={<Policy />} />
           <Route path="/chinh-sach-bao-hanh" element={<Policy />} />
           <Route path="/chinh-sach-bao-mat" element={<Policy />} />
-        </Routes>
+    <Route path="/login" element={<Login />} />
+  </Routes>
         <Footer />
       </Router>
     </CartProvider>
