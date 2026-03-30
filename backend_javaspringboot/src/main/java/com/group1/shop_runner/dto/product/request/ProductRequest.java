@@ -2,6 +2,7 @@ package com.group1.shop_runner.dto.product.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,4 +13,6 @@ public class ProductRequest {
     @NotBlank(message = "Name is required")
     private String name;
     private String description;
+    @NotNull(message = "Brand is required")
+    private Long brandId;
 }

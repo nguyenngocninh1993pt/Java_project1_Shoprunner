@@ -8,8 +8,8 @@ import com.group1.shop_runner.dto.product.response.ProductVariantResponse;
 import com.group1.shop_runner.entity.Product;
 import com.group1.shop_runner.entity.ProductImage;
 import com.group1.shop_runner.entity.ProductVariant;
-import com.group1.shop_runner.exception.AppException;
-import com.group1.shop_runner.exception.ErrorCode;
+import com.group1.shop_runner.shared.exception.AppException;
+import com.group1.shop_runner.shared.exception.ErrorCode;
 import com.group1.shop_runner.repository.ProductRepository;
 import com.group1.shop_runner.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.group1.shop_runner.entity.ProductCategory;
 import com.group1.shop_runner.repository.ProductCategoryRepository;
+import com.group1.shop_runner.entity.Brand;
+import com.group1.shop_runner.repository.BrandRepository;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -33,6 +35,9 @@ public class ProductService {
 
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
+
+    @Autowired
+    private BrandRepository brandRepository;
 
     // =========================================================
     // API 1: GET /api/products
@@ -87,9 +92,13 @@ public class ProductService {
     // - Trả về ProductDetailResponse sau khi lưu
     // =========================================================
     public ProductDetailResponse createProduct(ProductRequest request) {
+        Brand brand = brandRepository.findById(request.getBrandId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
+
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
+        product.setBrand(brand);
 
         Product savedProduct = productRepository.save(product);
 
@@ -130,8 +139,12 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
+        Brand brand = brandRepository.findById(request.getBrandId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
+
         product.setName(request.getName());
         product.setDescription(request.getDescription());
+        product.setBrand(brand);
 
         Product updatedProduct = productRepository.save(product);
 
@@ -210,7 +223,8 @@ public class ProductService {
                 product.getId(),
                 product.getName(),
                 extractMinPrice(product),
-                extractFirstImage(product)
+                extractFirstImage(product),
+                product.getBrand().getName()
         );
     }
 
@@ -242,7 +256,8 @@ public class ProductService {
                 product.getDescription(),
                 extractMinPrice(product),
                 images,
-                variants
+                variants,
+                product.getBrand().getName()
         );
     }
 

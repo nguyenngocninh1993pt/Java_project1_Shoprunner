@@ -14,7 +14,5 @@ public class ProductListResponse {
     private String name;
     private BigDecimal minPrice;
     private String image;
-
-    public ProductListResponse(Long id, String name, BigDecimal bigDecimal, String s, String description)    {
-    }
+    private String brandName;
 }

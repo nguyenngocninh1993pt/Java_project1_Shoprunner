@@ -1,4 +1,4 @@
-package com.group1.shop_runner.exception;
+package com.group1.shop_runner.shared.exception;
 
 public class AppException extends RuntimeException{
 

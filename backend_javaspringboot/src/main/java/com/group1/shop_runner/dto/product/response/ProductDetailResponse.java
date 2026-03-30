@@ -16,4 +16,5 @@ public class ProductDetailResponse {
     private BigDecimal minPrice;
     private List<String> images;
     private List<ProductVariantResponse> variants;
+    private String brandName;
 }
