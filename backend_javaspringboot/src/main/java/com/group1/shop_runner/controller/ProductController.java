@@ -4,6 +4,7 @@ import com.group1.shop_runner.dto.product.request.ProductRequest;
 import com.group1.shop_runner.dto.product.request.ProductVariantRequest;
 import com.group1.shop_runner.dto.product.response.ProductDetailResponse;
 import com.group1.shop_runner.dto.product.response.ProductListResponse;
+import com.group1.shop_runner.dto.product.response.ProductResponse;
 import com.group1.shop_runner.dto.product.response.ProductVariantResponse;
 import com.group1.shop_runner.service.ProductService;
 import jakarta.validation.Valid;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class ProductController {
 
     @Autowired
@@ -26,10 +27,10 @@ public class ProductController {
     // - Lấy danh sách tất cả sản phẩm
     // - Dùng cho trang danh sách sản phẩm ngoài frontend
     // =========================================================
-    @GetMapping
-    public List<ProductListResponse> getAllProducts() {
-        return productService.getAllProducts();
-    }
+//    @GetMapping
+//    public List<ProductListResponse> getAllProducts() {
+//        return productService.getAllProducts();
+//    }
 
     // =========================================================
     // API 2: GET /api/v1/products/{id}
@@ -126,9 +127,26 @@ public class ProductController {
     // - Lấy danh sách product theo category
     // - Trả về kiểu ProductListResponse để hiển thị ngoài trang list
     // =========================================================
-    @GetMapping("/category/{categoryId}")
-    public List<ProductListResponse> getProductsByCategory(@PathVariable Long categoryId) {
-        return productService.getProductsByCategory(categoryId);
+//    @GetMapping("/category/{categoryId}")
+//    public List<ProductListResponse> getProductsByCategory(@PathVariable Long categoryId) {
+//        return productService.getProductsByCategory(categoryId);
+//    }
+    //Lay 1 san pham detail theo id
+    @GetMapping("/detail/{id}")
+    public ProductResponse getProductDetail(@PathVariable Long id) {
+        return productService.getProductDetail(id);
     }
-
+    //lay nhieu san pham detail theo id
+    @GetMapping("/by-ids")
+    public List<ProductResponse> getProductsByIds(@RequestParam List<Long> ids) {
+        return productService.getProductsByIds(ids);
+    }
+    //Lay tat ca san pham detail
+    @GetMapping("/detail")
+    public ProductListResponse getAllProductDetail(
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        List<ProductResponse> products = productService.getAllProductDetail(page);
+        return new ProductListResponse(products);
+    }
 }

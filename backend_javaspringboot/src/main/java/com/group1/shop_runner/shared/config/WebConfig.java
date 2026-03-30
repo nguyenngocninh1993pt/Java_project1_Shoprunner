@@ -1,24 +1,24 @@
-package com.group1.shop_runner.shared.config;
+    package com.group1.shop_runner.shared.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.web.servlet.config.annotation.*;
 
-@Configuration
-public class WebConfig {
+    @Configuration
+    public class WebConfig {
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
+        @Bean
+        public WebMvcConfigurer corsConfigurer() {
+            return new WebMvcConfigurer() {
+                @Override
+                public void addCorsMappings(CorsRegistry registry) {
 
-                registry.addMapping("/**")
-                        .allowedOriginPatterns("*") // 👈 cho phép tất cả domain + port
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
+                    registry.addMapping("/**")
+                            .allowedOriginPatterns("*") // 👈 cho phép tất cả domain + port
+                            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                            .allowedHeaders("*")
+                            .allowCredentials(true);
+                }
+            };
+        }
     }
-}

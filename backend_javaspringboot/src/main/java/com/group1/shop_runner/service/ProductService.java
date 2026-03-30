@@ -1,28 +1,34 @@
 package com.group1.shop_runner.service;
 
+import com.group1.shop_runner.dto.category.CategoryDto;
+import com.group1.shop_runner.dto.product.ProductImageDto;
+import com.group1.shop_runner.dto.product.ProductVariantDto;
 import com.group1.shop_runner.dto.product.request.ProductRequest;
 import com.group1.shop_runner.dto.product.request.ProductVariantRequest;
 import com.group1.shop_runner.dto.product.response.ProductDetailResponse;
 import com.group1.shop_runner.dto.product.response.ProductListResponse;
+import com.group1.shop_runner.dto.product.response.ProductResponse;
 import com.group1.shop_runner.dto.product.response.ProductVariantResponse;
 import com.group1.shop_runner.entity.Product;
 import com.group1.shop_runner.entity.ProductImage;
 import com.group1.shop_runner.entity.ProductVariant;
+import com.group1.shop_runner.repository.*;
 import com.group1.shop_runner.shared.exception.AppException;
 import com.group1.shop_runner.shared.exception.ErrorCode;
-import com.group1.shop_runner.repository.ProductRepository;
-import com.group1.shop_runner.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.group1.shop_runner.entity.ProductCategory;
-import com.group1.shop_runner.repository.ProductCategoryRepository;
 import com.group1.shop_runner.entity.Brand;
-import com.group1.shop_runner.repository.BrandRepository;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -38,6 +44,10 @@ public class ProductService {
 
     @Autowired
     private BrandRepository brandRepository;
+    @Autowired
+    private ProductImageRepository productImageRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // =========================================================
     // API 1: GET /api/products
@@ -45,14 +55,14 @@ public class ProductService {
     // - Lấy danh sách tất cả sản phẩm để hiển thị ngoài trang list
     // - Chỉ trả về dữ liệu cần thiết: id, name, minPrice, image
     // =========================================================
-    @Transactional(readOnly = true)
-    public List<ProductListResponse> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-
-        return products.stream()
-                .map(this::mapToProductListResponse)
-                .toList();
-    }
+//    @Transactional(readOnly = true)
+//    public List<ProductListResponse> getAllProducts() {
+//        List<Product> products = productRepository.findAll();
+//
+//        return products.stream()
+//                .map(this::mapToProductListResponse)
+//                .toList();
+//    }
 
     // =========================================================
     // API 2: GET /api/products/{id}
@@ -202,31 +212,31 @@ public class ProductService {
     // - Lấy danh sách product theo category
     // - Trả về kiểu ProductListResponse để hiển thị ngoài trang list
     // =========================================================
-    @Transactional(readOnly = true)
-    public List<ProductListResponse> getProductsByCategory(Long categoryId) {
-        List<ProductCategory> productCategories = productCategoryRepository.findByCategory_Id(categoryId);
-
-        return productCategories.stream()
-                .map(ProductCategory::getProduct)
-                .distinct()
-                .map(this::mapToProductListResponse)
-                .toList();
-    }
+//    @Transactional(readOnly = true)
+//    public List<ProductListResponse> getProductsByCategory(Long categoryId) {
+//        List<ProductCategory> productCategories = productCategoryRepository.findByCategory_Id(categoryId);
+//
+//        return productCategories.stream()
+//                .map(ProductCategory::getProduct)
+//                .distinct()
+//                .map(this::mapToProductListResponse)
+//                .toList();
+//    }
 
     // =========================================================
     // MAPPER 1:
     // Chuyển Product entity -> ProductListResponse
     // Dùng cho API danh sách sản phẩm
     // =========================================================
-    private ProductListResponse mapToProductListResponse(Product product) {
-        return new ProductListResponse(
-                product.getId(),
-                product.getName(),
-                extractMinPrice(product),
-                extractFirstImage(product),
-                product.getBrand().getName()
-        );
-    }
+//    private ProductListResponse mapToProductListResponse(Product product) {
+//        return new ProductListResponse(
+//                product.getId(),
+//                product.getName(),
+//                extractMinPrice(product),
+//                extractFirstImage(product),
+//                product.getBrand().getName()
+//        );
+//    }
 
     // =========================================================
     // MAPPER 2:
@@ -311,5 +321,86 @@ public class ProductService {
                 .findFirst()
                 .map(ProductImage::getImageUrl)
                 .orElse(null);
+    }
+
+
+    // 3.1 Service: Lay 1 thong tin chi tiet san pham theo id
+    public ProductResponse getProductDetail(Long id) {
+
+        return getProductsByIds(List.of(id))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+    // 3.2 Service: Lay nhieu thong tin chi tiet san pham theo list id
+    public List<ProductResponse> getProductsByIds(List<Long> ids) {
+
+        List<ProductResponse> products = productRepository.getProductsByIds(ids);
+        Set<Long> foundIds = products.stream()
+                .map(ProductResponse::getId)
+                .collect(Collectors.toSet());
+
+        List<Long> missingIds = ids.stream()
+                .filter(id -> !foundIds.contains(id))
+                .toList();
+
+        if (!missingIds.isEmpty()) {
+            throw new AppException(
+                    ErrorCode.PRODUCT_NOT_FOUND,
+                    "Product not found with ids: " + missingIds
+            );
+        }
+        var images = productImageRepository.getImagesByProductIds(ids);
+        var variants = productVariantRepository.getVariantsByProductIds(ids);
+        var categories = categoryRepository.getByProductIds(ids);
+
+        Map<Long, List<ProductImageDto>> imageMap =
+                images.stream().collect(Collectors.groupingBy(ProductImageDto::getProductId));
+
+        Map<Long, List<ProductVariantDto>> variantMap =
+                variants.stream().collect(Collectors.groupingBy(ProductVariantDto::getProductId));
+
+        Map<Long, List<CategoryDto>> categoryMap =
+                categories.stream().collect(Collectors.groupingBy(CategoryDto::getProductId));
+
+        for (ProductResponse p : products) {
+            p.setImages(imageMap.getOrDefault(p.getId(), List.of()));
+            p.setVariants(variantMap.getOrDefault(p.getId(), List.of()));
+            p.setCategories(categoryMap.getOrDefault(p.getId(), List.of()));
+        }
+
+        return products;
+    }
+    // 3.3 Service: Lấy All Product details
+    public List<ProductResponse> getAllProductDetail(int page) {
+
+        Pageable pageable = PageRequest.of(page, 50);
+
+        List<ProductResponse> products = productRepository.getProducts(pageable).getContent();
+
+        List<Long> ids = products.stream()
+                .map(ProductResponse::getId)
+                .toList();
+
+        var images = productImageRepository.getImagesByProductIds(ids);
+        var variants = productVariantRepository.getVariantsByProductIds(ids);
+        var categories = categoryRepository.getByProductIds(ids);
+
+        Map<Long, List<ProductImageDto>> imageMap =
+                images.stream().collect(Collectors.groupingBy(ProductImageDto::getProductId));
+
+        Map<Long, List<ProductVariantDto>> variantMap =
+                variants.stream().collect(Collectors.groupingBy(ProductVariantDto::getProductId));
+
+        Map<Long, List<CategoryDto>> categoryMap =
+                categories.stream().collect(Collectors.groupingBy(CategoryDto::getProductId));
+
+        for (ProductResponse p : products) {
+            p.setImages(imageMap.getOrDefault(p.getId(), List.of()));
+            p.setVariants(variantMap.getOrDefault(p.getId(), List.of()));
+            p.setCategories(categoryMap.getOrDefault(p.getId(), List.of()));
+        }
+
+        return products;
     }
 }
