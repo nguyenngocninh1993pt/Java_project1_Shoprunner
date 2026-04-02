@@ -10,7 +10,7 @@ const Cart = () => {
   if (cartItems.length === 0)
     return (
       <div className="cart-empty">
-        <p>Giỏ hàng trống.</p>
+        <p>Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
         <button className="btn" onClick={() => navigate("/products")}>
           Quay lại cửa hàng
         </button>
@@ -34,16 +34,16 @@ const Cart = () => {
 
               <div className="cart-quantity">
                 <button onClick={() => updateQuantity(item.id, item.quantity > 1 ? item.quantity - 1 : 1)}>
-                  <Minus size={16}/>
+                  <Minus size={16} />
                 </button>
                 <span>{item.quantity}</span>
                 <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
-                  <Plus size={16}/>
+                  <Plus size={16} />
                 </button>
               </div>
 
               <button className="cart-remove" onClick={() => removeFromCart(item.id)}>
-                <Trash2 size={20}/>
+                <Trash2 size={20} />
               </button>
             </div>
           ))}

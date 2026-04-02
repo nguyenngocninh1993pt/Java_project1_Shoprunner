@@ -3,9 +3,14 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { Toaster } from "sonner";
+import { CartProvider } from './context/CartContext';
+// 1. Import AuthProvider vào đây
+import { AuthProvider } from './context/AuthContext';
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+    <AuthProvider>
+      <CartProvider>
     <App />
     <Toaster
       position="top-right"
@@ -15,6 +20,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         duration: 2500,
         style: { background: "#000", color: "#fff", borderRadius: "12px" },
       }}
+      
     />
+    </CartProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

@@ -31,16 +31,16 @@ const Home = () => {
       <section className="hero-section">
         <video
           className="hero-video"
-          src="hero.mp4"
+          src="shoes.mp4"
           autoPlay
           loop
           muted
           playsInline
         />
         <div className="hero-overlay">
-          <h1 className="hero-title">Just Feel The Power</h1>
+          <h1 className="hero-title">Just Run The World</h1>
           <p className="hero-subtitle">
-            Bộ sưu tập giày Nike mới nhất — tốc độ, phong cách và hiệu năng đỉnh cao.
+            Everything you need for running — shoes, apparel, and accessories, ready for every step of your journey.
           </p>
           <Link to="/products" className="btn">
             Khám phá ngay
