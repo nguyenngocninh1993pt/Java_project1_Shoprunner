@@ -2,21 +2,56 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
-import productsData from "../data/products.json";
 import { useCart } from "../context/CartContext";
+import "./Home.css";
+import addToCartIcon from "../../assets/icons/cart.png";
 
 const Home = () => {
   const [featured, setFeatured] = useState([]);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [activeId, setActiveId] = useState(null);
+
+  const productIds = [50, 51, 52, 64, 72, 73, 74, 75, 76, 77, 78, 79,180];
 
   useEffect(() => {
-    setFeatured(productsData.slice(0, 8));
+    const fetchProducts = async () => {
+      try {
+        const query = productIds.map((id) => `ids=${id}`).join("&");
+
+        const res = await fetch(
+          `http://localhost:8080/api/v1/products/by-ids?${query}`,
+        );
+
+        const data = await res.json();
+        console.log("API:", data);
+
+        if (Array.isArray(data)) {
+          setFeatured(data);
+        } else {
+          setFeatured([]);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const handleAddToCart = (item, e) => {
     e.stopPropagation();
-    addToCart(item, 1);
+
+    const product = {
+      id: item.id,
+      name: item.name,
+      price: item.variants?.[0]?.price || 0,
+      image: item.images?.[0]?.imageUrl || null,
+      variantId: item.variants?.[0]?.id || null,
+    };
+
+    addToCart(product, 1);
+
     toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
       action: {
         label: "Xem giỏ hàng",
@@ -27,7 +62,7 @@ const Home = () => {
 
   return (
     <div className="home">
-      {/* 🎬 Hero Section */}
+      {/* HERO */}
       <section className="hero-section">
         <video
           className="hero-video"
@@ -40,7 +75,8 @@ const Home = () => {
         <div className="hero-overlay">
           <h1 className="hero-title">Just Feel The Power</h1>
           <p className="hero-subtitle">
-            Bộ sưu tập giày Nike mới nhất — tốc độ, phong cách và hiệu năng đỉnh cao.
+            Phụ kiện chạy bộ cao cấp — tối ưu hiệu suất, thoải mái và sẵn sàng
+            cho mọi cung đường.
           </p>
           <Link to="/products" className="btn">
             Khám phá ngay
@@ -48,110 +84,230 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 🏀 Shop by Sport */}
-      <section className="sport-section container">
+      {/* SPORT */}
+      <section className="sport-section sport-container">
         <h2 className="section-title">Shop by Sport</h2>
+
         <div className="sport-grid">
-          {[
-            {
-              title: "Running",
-              img: "https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/5c2d3b6e-cbfa-4944-9573-6e62c521e517/WMNS+NIKE+AIR+MAX+EXCEE.png",
-            },
-            {
-              title: "Training",
-              img: "https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/805533ff-a59c-486c-9629-f690babde17a/NIKE+AIR+MAX+AP.png",
-            },
-            {
-              title: "Basketball",
-              img: "https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/f50fb043-d54c-466a-ade0-f97ebc8626e8/NIKE+AIR+MAX+90+PRM.png",
-            },
-            {
-              title: "Lifestyle",
-              img: "https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/f6463f6b-06bd-484f-a1c4-224013e3282f/W+NIKE+AIR+MAX+PORTAL.png",
-            },
-          ].map((sport, i) => (
-            <div key={i} className="sport-card" onClick={() => navigate("/products")}>
-              <img src={sport.img} alt={sport.title} />
-              <div className="sport-overlay">
-                <span>{sport.title}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+          {featured.slice(0, 5).map((item) => {
+            const image = item.images?.[0]?.imageUrl;
+            const price = item.variants?.[0]?.price || 0;
 
-      {/* 🛍️ Featured Products */}
-      <section className="featured-section container">
-        <h2 className="section-title">Outstanding product</h2>
-        <div className="featured-grid">
-          {featured.map((item) => (
-            <div
-              key={item.id}
-              className="product-card"
-              onClick={() => navigate(`/product/${item.id}`)}
-            >
-              <div className="product-image">
-                <img src={item.image} alt={item.name} />
-                <button
-                  className="cart-btn"
-                  onClick={(e) => handleAddToCart(item, e)}
-                >
-                  <ShoppingCart size={18} />
-                </button>
-              </div>
-              <div className="product-info">
-                <h3>{item.name}</h3>
-                <p className="category">{item.category}</p>
-                <p className="price">{item.price.toLocaleString()} ₫</p>
-                <Link
-                  to={`/product/${item.id}`}
-                  className="btn-outline"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Mua ngay
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 🏷️ Shop by Icons */}
-      <section className="icons-section">
-        <div className="container">
-          <h2 className="section-title">Shop by Icons</h2>
-          <div className="scroll-row">
-            {[...productsData, ...productsData].map((item, index) => (
+            return (
               <div
-                key={index}
-                className="scroll-item"
+                key={item.id}
+                className="card-wrapper"
                 onClick={() => navigate(`/product/${item.id}`)}
               >
-                <img src={item.image} alt={item.name} />
-                <div className="scroll-overlay">
-                  <p>{item.name}</p>
-                  <div className="scroll-actions">
-                    <button
-                      onClick={(e) => handleAddToCart(item, e)}
-                      className="scroll-btn"
-                    >
-                      <ShoppingCart size={16} />
-                    </button>
-                    <Link
-                      to={`/product/${item.id}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="scroll-btn"
-                    >
-                      Mua ngay
-                    </Link>
+                <div className="card-container">
+                  <div
+                    className="card-top"
+                    style={{ backgroundImage: `url(${image})` }}
+                  />
+
+                  <div
+                    className={`card-bottom ${
+                      activeId === item.id ? "clicked" : ""
+                    }`}
+                  >
+                    <div className="card-left">
+                      <div className="card-details">
+                        <h1>{item.name}</h1>
+                        <p>{price.toLocaleString()} ₫</p>
+                      </div>
+
+                      <div
+                        className="card-buy"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(item, e);
+                          setActiveId(item.id);
+                          setTimeout(() => setActiveId(null), 1500);
+                        }}
+                      >
+                        <img src={addToCartIcon} alt="" />
+                      </div>
+                    </div>
+
+                    <div className="card-right">
+                      <div className="card-done">✔</div>
+                      
+                    </div>
+                  </div>
+                </div>
+
+                {/* INFO */}
+                <div
+                  className="card-inside"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="card-icon">ℹ</div>
+
+                  <div className="card-contents">
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Category</th>
+                          <td>{item.categories?.[0]?.name || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <th>Brand</th>
+                          <td>{item.brand || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <th>Price</th>
+                          <td>{price.toLocaleString()} ₫</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
 
+      {/* FEATURED */}
+      <section className="featured-section container">
+        <h2 className="section-title">Outstanding product</h2>
+
+        <div className="featured-grid">
+          {featured.slice(5, 13).map((item) => {
+            const image = item.images?.[0]?.imageUrl;
+            const price = item.variants?.[0]?.price || 0;
+
+            return (
+              <div
+                key={item.id}
+                className="card-wrapper"
+                onClick={() => navigate(`/product/${item.id}`)}
+              >
+                <div className="card-container">
+                  <div
+                    className="card-top"
+                    style={{ backgroundImage: `url(${image})` }}
+                  />
+
+                  <div
+                    className={`card-bottom ${
+                      activeId === item.id ? "clicked" : ""
+                    }`}
+                  >
+                    <div className="card-left">
+                      <div className="card-details">
+                        <h1>{item.name}</h1>
+                        <p>{price.toLocaleString()} ₫</p>
+                      </div>
+
+                      <div
+                        className="card-buy"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(item, e);
+                          setActiveId(item.id);
+                          setTimeout(() => setActiveId(null), 1500);
+                        }}
+                      >
+                        <img src={addToCartIcon} alt="" />
+                      </div>
+                    </div>
+
+                    <div className="card-right">
+                      <div className="card-done">✔</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* INFO */}
+                <div
+                  className="card-inside"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="card-icon">ℹ</div>
+
+                  <div className="card-contents">
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Category</th>
+                          <td>{item.categories?.[0]?.name || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <th>Brand</th>
+                          <td>{item.brand || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <th>Price</th>
+                          <td>{price.toLocaleString()} ₫</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ICONS */}
+      <section className="icons-section">
+        <div className="container">
+          <h2 className="section-title">Shop by Icons</h2>
+
+          <div className="scroll-row">
+            {[...featured, ...featured].map((item, index) => {
+              const image = item.images?.[0]?.imageUrl;
+
+              return (
+                <div
+                  key={index}
+                  className="scroll-item"
+                  onClick={() => navigate(`/product/${item.id}`)}
+                >
+                  {image && (
+                    <img
+                      src={image}
+                      alt={item.name}
+                      className="icon-img"
+                      onLoad={(e) => {
+                        const img = e.target;
+                        const ratio = img.naturalWidth / img.naturalHeight;
+
+                        if (ratio > 1.5) {
+                          img.style.objectFit = "contain";
+                        }
+                      }}
+                    />
+                  )}
+
+                  <div className="scroll-overlay">
+                    <p>{item.name}</p>
+
+                    <div className="scroll-actions">
+                      <button
+                        onClick={(e) => handleAddToCart(item, e)}
+                        className="scroll-btn"
+                      >
+                        <ShoppingCart size={16} />
+                      </button>
+
+                      <Link
+                        to={`/product/${item.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="scroll-btn"
+                      >
+                        Mua ngay
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

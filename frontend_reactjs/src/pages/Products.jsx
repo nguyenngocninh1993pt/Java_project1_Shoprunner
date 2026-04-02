@@ -1,172 +1,214 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
-import { toast } from "sonner";
-import { useCart } from "../context/CartContext";
+import "./Products.css";
+
+const ITEMS_PER_PAGE = 16;
 
 const Products = () => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
 
-  const [products, setProducts] = useState([]);
-  const [filtered, setFiltered] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [page, setPage] = useState(1);
 
-  const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState("none");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
+
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  const [loading, setLoading] = useState(true);
-
+  /* ================= FETCH ALL PRODUCTS ================= */
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/products")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Không lấy được danh sách sản phẩm");
+    const fetchAllProducts = async () => {
+      try {
+        let all = [];
+        let pageIndex = 0;
+
+        while (true) {
+          const res = await fetch(
+            `http://localhost:8080/api/v1/products/detail?page=${pageIndex}`,
+          );
+
+          const data = await res.json();
+
+          if (!data.products || data.products.length === 0) {
+            break;
+          }
+
+          const mapped = data.products.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.variants?.[0]?.price || 0,
+            brand: item.brand || "",
+            category: item.categories?.[0]?.name || "",
+            image: item.images?.[0]?.imageUrl || "",
+          }));
+
+          all = [...all, ...mapped];
+
+          pageIndex++;
         }
-        return res.json();
-      })
-      .then((data) => {
-        setProducts(data);
-        setFiltered(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
+
+        setAllProducts(all);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchAllProducts();
   }, []);
+  /* ================= FILTER ================= */
 
-  useEffect(() => {
-    let result = [...products];
+  const categories = [...new Set(allProducts.map((p) => p.category))];
+  const brands = [...new Set(allProducts.map((p) => p.brand))];
 
-    // search theo tên
-    if (search.trim()) {
-      result = result.filter((p) =>
-        p.name?.toLowerCase().includes(search.toLowerCase())
-      );
+  const toggleCheckbox = (value, list, setList) => {
+    if (list.includes(value)) {
+      setList(list.filter((v) => v !== value));
+    } else {
+      setList([...list, value]);
     }
-
-    // lọc giá theo minPrice
-    if (minPrice) {
-      result = result.filter((p) => p.minPrice >= Number(minPrice));
-    }
-
-    if (maxPrice) {
-      result = result.filter((p) => p.minPrice <= Number(maxPrice));
-    }
-
-    // sort theo minPrice
-    if (sortOrder === "asc") {
-      result.sort((a, b) => a.minPrice - b.minPrice);
-    }
-
-    if (sortOrder === "desc") {
-      result.sort((a, b) => b.minPrice - a.minPrice);
-    }
-
-    setFiltered(result);
-  }, [search, sortOrder, minPrice, maxPrice, products]);
-
-  const handleAddToCart = (item) => {
-    addToCart(item, 1);
-    toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
-      action: { label: "Xem giỏ hàng", onClick: () => navigate("/cart") },
-    });
   };
 
-  if (loading) {
-    return <p style={{ textAlign: "center" }}>Đang tải...</p>;
-  }
+  const filtered = allProducts.filter((p) => {
+    if (selectedCategories.length && !selectedCategories.includes(p.category))
+      return false;
+    if (selectedBrands.length && !selectedBrands.includes(p.brand))
+      return false;
+    if (minPrice && p.price < Number(minPrice)) return false;
+    if (maxPrice && p.price > Number(maxPrice)) return false;
+    return true;
+  });
+
+  /* ================= RESET PAGE WHEN FILTER ================= */
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategories, selectedBrands, minPrice, maxPrice]);
+
+  /* ================= PAGINATION ================= */
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+
+  const displayProducts = filtered.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE,
+  );
+
+  /* ================= RENDER ================= */
 
   return (
-    <div
-      className="container"
-      style={{ paddingTop: "2rem", paddingBottom: "4rem" }}
-    >
-      <h1 className="section-title">Danh sách sản phẩm</h1>
+    <div className="products-layout">
+      {/* SIDEBAR */}
+      <div className="sidebar">
+        <h3 className="filter-title">Filter</h3>
 
-      {/* Filters */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-          marginBottom: "2rem",
-          paddingLeft: "6%",
-          paddingRight: "6%",
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Tìm kiếm..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        {/* CATEGORY */}
+        <div className="filter-group">
+          <p>Category</p>
+          {categories.map((cat, i) => (
+            <label key={i} className="filter-item">
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(cat)}
+                onChange={() =>
+                  toggleCheckbox(cat, selectedCategories, setSelectedCategories)
+                }
+              />
+              <span>{cat}</span>
+            </label>
+          ))}
+        </div>
 
-        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-          <option value="none">Mặc định</option>
-          <option value="asc">Giá tăng</option>
-          <option value="desc">Giá giảm</option>
-        </select>
+        {/* BRAND */}
+        <div className="filter-group">
+          <p>Brand</p>
+          {brands.map((brand, i) => (
+            <label key={i} className="filter-item">
+              <input
+                type="checkbox"
+                checked={selectedBrands.includes(brand)}
+                onChange={() =>
+                  toggleCheckbox(brand, selectedBrands, setSelectedBrands)
+                }
+              />
+              <span>{brand}</span>
+            </label>
+          ))}
+        </div>
 
-        <input
-          type="number"
-          placeholder="Giá từ"
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
-        />
-
-        <input
-          type="number"
-          placeholder="Giá đến"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-        />
+        {/* PRICE */}
+        <div className="filter-group">
+          <p>Price</p>
+          <div className="price-inputs">
+            <input
+              type="number"
+              placeholder="Min"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+            />
+            <span>-</span>
+            <input
+              type="number"
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Products */}
-      {filtered.length === 0 ? (
-        <p style={{ textAlign: "center" }}>Không có sản phẩm</p>
-      ) : (
+      {/* PRODUCTS */}
+      <div className="products-content">
         <div className="featured-grid">
-          {filtered.map((item) => (
+          {displayProducts.map((item) => (
             <div
               key={item.id}
               className="product-card"
               onClick={() => navigate(`/product/${item.id}`)}
             >
               <div className="product-image">
-                <img
-                  src={item.image || "https://via.placeholder.com/300x300?text=No+Image"}
-                  alt={item.name}
-                />
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(item);
-                  }}
-                >
-                  <ShoppingCart size={20} />
-                </button>
+                <img src={item.image} alt={item.name} />
               </div>
 
               <div className="product-info">
-                <h3>{item.name}</h3>
-                {/* <p>{item.description || "Chưa có mô tả"}</p> */}
-                <p>{item.minPrice?.toLocaleString()} ₫</p>
+                <h3 className="product-name">{item.name}</h3>
 
-                <Link
-                  to={`/product/${item.id}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Mua ngay
-                </Link>
+                <div className="product-bottom">
+                  <p className="price">{item.price.toLocaleString()} ₫</p>
+
+                  <button
+                    className="cart-icon-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("Add to cart", item);
+                    }}
+                  >
+                    <ShoppingCart size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      )}
+
+        {/* PAGINATION */}
+        <div className="pagination">
+          <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+            Prev
+          </button>
+
+          <span>
+            {page} / {totalPages}
+          </span>
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
