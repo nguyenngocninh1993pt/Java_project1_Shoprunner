@@ -12,7 +12,7 @@ const Home = () => {
   const { addToCart } = useCart();
   const [activeId, setActiveId] = useState(null);
 
-  const productIds = [50, 51, 52, 64, 72, 73, 74, 75, 76, 77, 78, 79,180];
+  const productIds = [50, 51, 52, 64, 72, 73, 74, 75, 76, 77, 78, 79, 180];
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -97,7 +97,7 @@ const Home = () => {
               <div
                 key={item.id}
                 className="card-wrapper"
-                onClick={() => navigate(`/product/${item.id}`)}
+                onClick={() => navigate(`/product/detail/${item.id}`)}
               >
                 <div className="card-container">
                   <div
@@ -131,7 +131,6 @@ const Home = () => {
 
                     <div className="card-right">
                       <div className="card-done">✔</div>
-                      
                     </div>
                   </div>
                 </div>
@@ -181,7 +180,7 @@ const Home = () => {
               <div
                 key={item.id}
                 className="card-wrapper"
-                onClick={() => navigate(`/product/${item.id}`)}
+                onClick={() => navigate(`/product/detail/${item.id}`)}
               >
                 <div className="card-container">
                   <div
@@ -264,7 +263,7 @@ const Home = () => {
                 <div
                   key={index}
                   className="scroll-item"
-                  onClick={() => navigate(`/product/${item.id}`)}
+                  onClick={() => navigate(`/product/detail/${item.id}`)}
                 >
                   {image && (
                     <img
@@ -294,7 +293,7 @@ const Home = () => {
                       </button>
 
                       <Link
-                        to={`/product/${item.id}`}
+                        to={`/product/detail/${item.id}`}
                         onClick={(e) => e.stopPropagation()}
                         className="scroll-btn"
                       >
