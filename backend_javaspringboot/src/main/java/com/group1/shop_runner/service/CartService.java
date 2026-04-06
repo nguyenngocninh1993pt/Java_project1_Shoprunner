@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -187,6 +188,7 @@ public class CartService {
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+
         return new CartResponse(
                 cart.getId(),
                 cart.getUser() != null ? cart.getUser().getId() : null,
@@ -205,6 +207,12 @@ public class CartService {
 
         BigDecimal lineTotal = variant.getPrice()
                 .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+        String imageUrl = variant.getProduct().getImages()
+                .stream()
+                .sorted(Comparator.comparingInt(img -> img.getPosition()))
+                .findFirst()
+                .map(img -> img.getImageUrl())
+                .orElse(null);
 
         return new CartItemResponse(
                 cartItem.getId(),
@@ -216,7 +224,8 @@ public class CartService {
                 variant.getOption3Value(),
                 variant.getPrice(),
                 cartItem.getQuantity(),
-                lineTotal
+                lineTotal,
+                imageUrl
         );
     }
 }
