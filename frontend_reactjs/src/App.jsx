@@ -13,6 +13,7 @@ import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import Policy from "./pages/Policy";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <Route path="/chinh-sach-bao-hanh" element={<Policy />} />
           <Route path="/chinh-sach-bao-mat" element={<Policy />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
         <Footer />
       </Router>

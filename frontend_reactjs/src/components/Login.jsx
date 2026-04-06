@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Lock, LogIn } from "lucide-react";
 import "./Login.css";
@@ -76,7 +76,7 @@ const Login = () => {
 
         <div className="login-footer">
           <p>
-            Chưa có tài khoản? <a href="#">Đăng ký ngay</a>
+            Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
           </p>
         </div>
       </div>
