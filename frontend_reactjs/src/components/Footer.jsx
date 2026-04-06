@@ -31,20 +31,19 @@ function Footer() {
         <div className="footer-col">
           <h2 className="footer-logo">SHOESTORE</h2>
           <p className="footer-text">
-            Cửa hàng chính hãng chuyên cung cấp giày thể thao Nike và các dòng
-            sneaker cao cấp. <br />
-            Trải nghiệm hiệu năng và phong cách đỉnh cao cùng chúng tôi.
+            Từ máy chạy đến đường đua<br/> Trọn bộ hành trang, bứt phá giới hạn. <br />
+            Khám phá ngay kho trang bị chuyên nghiệp giúp bạn bứt tốc trên mọi cung đường!
           </p>
         </div>
 
-        {/* Cột 2 - Liên kết */}
+        {/* Cột 2 - Liên kết */}  
         <div className="footer-col" style={{ transitionDelay: "0.1s" }}>
           <h3 className="footer-title">Khám phá</h3>
           <ul className="footer-links">
             <li><Link to="/">Trang chủ</Link></li>
             <li><Link to="/products">Sản phẩm</Link></li>
-            <li><a href="#">Giới thiệu</a></li>
-            <li><a href="#">Liên hệ</a></li>
+            <li><Link to="/aboutus">Giới thiệu</Link></li>
+            <li><Link to="/contact">Liên hệ</Link></li>
           </ul>
         </div>
 
@@ -52,9 +51,9 @@ function Footer() {
         <div className="footer-col" style={{ transitionDelay: "0.2s" }}>
           <h3 className="footer-title">Hỗ trợ</h3>
           <ul className="footer-links">
-            <li><a href="#">Chính sách đổi trả</a></li>
-            <li><a href="#">Giao hàng & Thanh toán</a></li>
-            <li><a href="#">Chính sách bảo mật</a></li>
+            <li><Link to="/chinh-sach-doi-tra">Chính sách đổi trả</Link></li>
+            <li><Link to="/chinh-sach-bao-hanh">Chính sách bảo hành</Link></li>
+            <li><Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link></li>
           </ul>
         </div>
 
@@ -85,9 +84,9 @@ function Footer() {
       {/* Dòng cuối */}
       <div className="footer-bottom">
         <p>
-          © {new Date().getFullYear()} Shoestore. All rights reserved.
+          © {new Date().getFullYear()} ShopRunner. All rights reserved.
           <br />
-          Made by <span className="footer-team">Shoestore Team</span>
+          Made by <span className="footer-team">ShopRunner Team</span>
         </p>
       </div>
     </footer>
