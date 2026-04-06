@@ -18,18 +18,20 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+
   const images = product?.images
     ? [...product.images].sort((a, b) => a.position - b.position)
     : [];
-  // ✅ FETCH API
+
   useEffect(() => {
     fetch(`http://localhost:8080/api/v1/products/detail/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("DETAIL:", data);
         setProduct(data);
+        setSelectedVariant(data.variants?.[0]);
       })
       .catch(console.error);
   }, [id]);
@@ -41,20 +43,22 @@ const ProductDetail = () => {
       </p>
     );
 
-  // ✅ LẤY DỮ LIỆU ĐÚNG FORMAT API
-  const image = product.images?.sort((a, b) => a.position - b.position)?.[0]
-    ?.imageUrl;
-
-  const price = product.variants?.[0]?.price || 0;
+  const image = images?.[0]?.imageUrl;
+  const price = selectedVariant?.price || 0;
   const category = product.categories?.[0]?.name || "";
+  const optionName = product.option1Name;
+  const variants = product.variants || [];
 
   const handleAddToCart = () => {
+    if (!selectedVariant) return;
+
     const cartItem = {
       id: product.id,
       name: product.name,
-      price: price,
+      price: selectedVariant.price,
       image: image,
-      variantId: product.variants?.[0]?.id,
+      variantId: selectedVariant.id,
+      option: selectedVariant.option1Value,
     };
 
     addToCart(cartItem, quantity);
@@ -65,6 +69,22 @@ const ProductDetail = () => {
         onClick: () => navigate("/cart"),
       },
     });
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedVariant) return;
+
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: selectedVariant.price,
+      image: image,
+      variantId: selectedVariant.id,
+      option: selectedVariant.option1Value,
+    };
+
+    addToCart(cartItem, quantity);
+    navigate("/cart");
   };
 
   const advantages = [
@@ -79,7 +99,6 @@ const ProductDetail = () => {
   return (
     <div className="pd-wrapper">
       <div className="pd-main">
-        {/* IMAGE */}
         <div className="pd-image-section">
           {image && (
             <div className="pd-main-image-box">
@@ -104,7 +123,6 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* INFO */}
         <div className="pd-info">
           <h1 className="pd-title">{product.name}</h1>
 
@@ -112,7 +130,26 @@ const ProductDetail = () => {
 
           <p className="pd-category">{category}</p>
 
-          {/* QUANTITY */}
+          {optionName && (
+            <div className="pd-variant">
+              <p className="pd-variant-title">{optionName}:</p>
+
+              <div className="pd-variant-list">
+                {variants.map((v) => (
+                  <button
+                    key={v.id}
+                    className={`pd-variant-item ${
+                      selectedVariant?.id === v.id ? "active" : ""
+                    }`}
+                    onClick={() => setSelectedVariant(v)}
+                  >
+                    {v.option1Value}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="pd-qty-row">
             <span>Số lượng:</span>
 
@@ -135,12 +172,16 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* ADD TO CART */}
-          <button onClick={handleAddToCart} className="pd-add-btn">
-            <ShoppingCart size={20} /> Thêm vào giỏ hàng
-          </button>
+          <div className="pd-action-buttons">
+            <button onClick={handleAddToCart} className="pd-add-btn">
+              <ShoppingCart size={20} /> Thêm vào giỏ
+            </button>
 
-          {/* ADVANTAGES */}
+            <button onClick={handleBuyNow} className="pd-buy-btn">
+              Mua ngay
+            </button>
+          </div>
+
           <div className="pd-advantages">
             {advantages.map((adv, idx) => (
               <div key={idx} className="pd-adv-item">
@@ -152,7 +193,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* DESCRIPTION */}
       <div className="pd-desc">
         <h2>Mô tả sản phẩm</h2>
 

@@ -17,51 +17,77 @@ const Products = () => {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  /* ================= FETCH ALL PRODUCTS ================= */
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  // ================= FETCH BRANDS =================
   useEffect(() => {
-    const fetchAllProducts = async () => {
+    const fetchFilters = async () => {
       try {
-        let all = [];
-        let pageIndex = 0;
+        const [brandRes, categoryRes] = await Promise.all([
+          fetch("http://localhost:8080/api/v1/brands"),
+          fetch("http://localhost:8080/api/v1/categories"),
+        ]);
 
-        while (true) {
-          const res = await fetch(
-            `http://localhost:8080/api/v1/products/detail?page=${pageIndex}`,
-          );
+        const brandData = await brandRes.json();
+        const categoryData = await categoryRes.json();
 
-          const data = await res.json();
-
-          if (!data.products || data.products.length === 0) {
-            break;
-          }
-
-          const mapped = data.products.map((item) => ({
-            id: item.id,
-            name: item.name,
-            price: item.variants?.[0]?.price || 0,
-            brand: item.brand || "",
-            category: item.categories?.[0]?.name || "",
-            image: item.images?.[0]?.imageUrl || "",
-          }));
-
-          all = [...all, ...mapped];
-
-          pageIndex++;
-        }
-
-        setAllProducts(all);
+        setBrands(brandData || []);
+        setCategories(categoryData || []);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchAllProducts();
+    fetchFilters();
   }, []);
-  /* ================= FILTER ================= */
 
-  const categories = [...new Set(allProducts.map((p) => p.category))];
-  const brands = [...new Set(allProducts.map((p) => p.brand))];
+  // ================= LOAD PRODUCTS PROGRESSIVELY =================
+  useEffect(() => {
+    let isMounted = true;
 
+    const fetchAllProducts = async () => {
+      let pageIndex = 0;
+
+      while (true) {
+        try {
+          const res = await fetch(
+            `http://localhost:8080/api/v1/products/detail?page=${pageIndex}`
+          );
+
+          const data = await res.json();
+
+          if (!data.products || data.products.length === 0) break;
+
+          const mapped = data.products.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.variants?.[0]?.price || 0,
+            brand: item.brand?.name || "",
+            category: item.categories?.[0]?.name || "",
+            image: item.images?.[0]?.imageUrl || "",
+          }));
+
+          if (!isMounted) break;
+
+          setAllProducts((prev) => [...prev, ...mapped]);
+
+          pageIndex++;
+        } catch (err) {
+          console.error(err);
+          break;
+        }
+      }
+    };
+
+    fetchAllProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // ================= FILTER =================
   const toggleCheckbox = (value, list, setList) => {
     if (list.includes(value)) {
       setList(list.filter((v) => v !== value));
@@ -73,29 +99,30 @@ const Products = () => {
   const filtered = allProducts.filter((p) => {
     if (selectedCategories.length && !selectedCategories.includes(p.category))
       return false;
+
     if (selectedBrands.length && !selectedBrands.includes(p.brand))
       return false;
+
     if (minPrice && p.price < Number(minPrice)) return false;
     if (maxPrice && p.price > Number(maxPrice)) return false;
+
     return true;
   });
 
-  /* ================= RESET PAGE WHEN FILTER ================= */
+  // ================= RESET PAGE WHEN FILTER =================
   useEffect(() => {
     setPage(1);
   }, [selectedCategories, selectedBrands, minPrice, maxPrice]);
 
-  /* ================= PAGINATION ================= */
-
+  // ================= PAGINATION =================
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
 
   const displayProducts = filtered.slice(
     (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
   );
 
-  /* ================= RENDER ================= */
-
+  // ================= RENDER =================
   return (
     <div className="products-layout">
       {/* SIDEBAR */}
@@ -105,16 +132,20 @@ const Products = () => {
         {/* CATEGORY */}
         <div className="filter-group">
           <p>Category</p>
-          {categories.map((cat, i) => (
-            <label key={i} className="filter-item">
+          {categories.map((cat) => (
+            <label key={cat.id} className="filter-item">
               <input
                 type="checkbox"
-                checked={selectedCategories.includes(cat)}
+                checked={selectedCategories.includes(cat.name)}
                 onChange={() =>
-                  toggleCheckbox(cat, selectedCategories, setSelectedCategories)
+                  toggleCheckbox(
+                    cat.name,
+                    selectedCategories,
+                    setSelectedCategories
+                  )
                 }
               />
-              <span>{cat}</span>
+              <span>{cat.name}</span>
             </label>
           ))}
         </div>
@@ -122,16 +153,16 @@ const Products = () => {
         {/* BRAND */}
         <div className="filter-group">
           <p>Brand</p>
-          {brands.map((brand, i) => (
-            <label key={i} className="filter-item">
+          {brands.map((brand) => (
+            <label key={brand.id} className="filter-item">
               <input
                 type="checkbox"
-                checked={selectedBrands.includes(brand)}
+                checked={selectedBrands.includes(brand.name)}
                 onChange={() =>
-                  toggleCheckbox(brand, selectedBrands, setSelectedBrands)
+                  toggleCheckbox(brand.name, selectedBrands, setSelectedBrands)
                 }
               />
-              <span>{brand}</span>
+              <span>{brand.name}</span>
             </label>
           ))}
         </div>
@@ -191,18 +222,16 @@ const Products = () => {
           ))}
         </div>
 
-        {/* PAGINATION */}
+        {/* PAGINATION (ONLY CURRENT PAGE) */}
         <div className="pagination">
           <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
             Prev
           </button>
 
-          <span>
-            {page} / {totalPages}
-          </span>
+          <span>{page}</span>
 
           <button
-            disabled={page === totalPages}
+            disabled={page >= totalPages}
             onClick={() => setPage((p) => p + 1)}
           >
             Next
