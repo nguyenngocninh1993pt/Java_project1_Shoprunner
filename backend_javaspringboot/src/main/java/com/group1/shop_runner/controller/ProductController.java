@@ -11,7 +11,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -148,5 +150,24 @@ public class ProductController {
     ) {
         List<ProductResponse> products = productService.getAllProductDetail(page);
         return new ProductListResponse(products);
+    }
+    //Lay san pham theo filter
+    @GetMapping("/filter")
+    public Map<String, Object> filterProducts(
+            @RequestParam(required = false) List<Long> brands,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        List<ProductResponse> products = productService.filterProducts(
+                brands,
+                categories,
+                minPrice,
+                maxPrice,
+                page
+        );
+
+        return Map.of("products", products);
     }
 }

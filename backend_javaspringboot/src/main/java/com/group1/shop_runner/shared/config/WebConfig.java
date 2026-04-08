@@ -14,7 +14,7 @@
                 public void addCorsMappings(CorsRegistry registry) {
 
                     registry.addMapping("/**")
-                            .allowedOriginPatterns("*") // 👈 cho phép tất cả domain + port
+                            .allowedOriginPatterns("*")
                             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                             .allowedHeaders("*")
                             .allowCredentials(true);
