@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Lock, LogIn } from "lucide-react";
+import axios from "axios";
 import "./Login.css";
 
 const Login = () => {
@@ -10,21 +11,41 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let userData = null;
-    if (email === "admin@gmail.com" && password === "123") {
-      userData = { email, role: "admin", name: "Quản trị viên" };
-    } else if (email === "user@gmail.com" && password === "123") {
-      userData = { email, role: "user", name: "Khách hàng" };
-    }
+    try {
+      console.log("Email:", email);
+      console.log("Password:", password);
+      const response = await axios.post("http://localhost:8080/auth/login", {
+        email,
+        password,
+      });
 
-    if (userData) {
+      const { token, username, role } = response.data;
+
+      const userData = {
+        username,
+        email,
+        role,
+        token,
+      };
+
       login(userData);
-      userData.role === "admin" ? navigate("/admin") : navigate("/");
-    } else {
-      alert("Thông tin đăng nhập không chính xác!");
+      localStorage.setItem("token", token);
+
+      // redirect
+      if (role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+
+      const message = error.response?.data?.message || "Đăng nhập thất bại!";
+
+      alert(message);
     }
   };
 

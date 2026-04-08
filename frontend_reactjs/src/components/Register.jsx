@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, User, UserPlus, CheckCircle, AlertCircle } from "lucide-react";
+import axios from "axios";
 import "./Login.css";
 
 const Register = () => {
@@ -8,17 +9,16 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  
-  // Thêm state để quản lý thông báo
+
   const [message, setMessage] = useState({ type: "", text: "" });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" }); // Reset thông báo
+    setMessage({ type: "", text: "" });
 
-    // Kiểm tra mật khẩu xác nhận
+    // validate password
     if (password !== confirmPassword) {
       setMessage({ type: "error", text: "Mật khẩu xác nhận không khớp!" });
       return;
@@ -26,17 +26,33 @@ const Register = () => {
 
     setIsLoading(true);
 
-    // Giả lập delay gọi API (1 giây)
-    setTimeout(() => {
-      setIsLoading(false);
-      setMessage({ type: "success", text: "Đăng ký thành công! Đang chuyển hướng..." });
-      
-      // Tự động chuyển về trang đăng nhập sau 2 giây
+    try {
+      await axios.post("http://localhost:8080/auth/register", {
+        username: fullName,
+        email,
+        password,
+      });
+
+      setMessage({
+        type: "success",
+        text: "Đăng ký thành công! Đang chuyển hướng...",
+      });
+
       setTimeout(() => {
         navigate("/login");
       }, 2000);
-      
-    }, 1000);
+
+    } catch (error) {
+      console.error(error);
+
+      setMessage({
+        type: "error",
+        text: error.response?.data || "Đăng ký thất bại!",
+      });
+
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,10 +63,13 @@ const Register = () => {
           <p>Tham gia cùng SHOP RUNNER ngay hôm nay</p>
         </div>
 
-        {/* Khu vực hiển thị thông báo hiện đại */}
         {message.text && (
           <div className={`modern-alert alert-${message.type}`}>
-            {message.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+            {message.type === "success" ? (
+              <CheckCircle size={20} />
+            ) : (
+              <AlertCircle size={20} />
+            )}
             <span>{message.text}</span>
           </div>
         )}
@@ -100,10 +119,10 @@ const Register = () => {
             />
           </div>
 
-          <button 
-            type="submit" 
-            className="login-submit-btn" 
-            disabled={isLoading || message.type === "success"}
+          <button
+            type="submit"
+            className="login-submit-btn"
+            disabled={isLoading}
           >
             <UserPlus size={20} />
             <span>{isLoading ? "Đang xử lý..." : "Đăng ký"}</span>
@@ -111,7 +130,9 @@ const Register = () => {
         </form>
 
         <div className="login-footer">
-          <p>Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link></p>
+          <p>
+            Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+          </p>
         </div>
       </div>
     </div>

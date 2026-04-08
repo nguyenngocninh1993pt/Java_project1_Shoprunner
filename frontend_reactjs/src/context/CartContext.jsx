@@ -14,19 +14,29 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1) => {
-    setCartItems((prev) => {
-      const exist = prev.find((item) => item.id === product.id);
-      if (exist) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      } else {
-        return [...prev, { ...product, quantity }];
-      }
-    });
+  const addToCart = async (product, quantity = 1) => {
+    try {
+      const res = await fetch("http://localhost:8080/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          productId: product.id,
+          variantId: product.variantId,
+          quantity: quantity,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Add to cart failed");
+
+      const data = await res.json();
+
+      setCartItems(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const removeFromCart = (id) => {
@@ -38,14 +48,14 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = (id, quantity) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-      )
+        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item,
+      ),
     );
   };
 
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
 
   return (

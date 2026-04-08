@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import "./Products.css";
 
-const ITEMS_PER_PAGE = 16;
-
 const Products = () => {
   const navigate = useNavigate();
 
-  const [allProducts, setAllProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -17,10 +15,14 @@ const Products = () => {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
+  // 👉 giá dùng để gọi API (chỉ update khi bấm Apply)
+  const [appliedMin, setAppliedMin] = useState("");
+  const [appliedMax, setAppliedMax] = useState("");
+
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  // ================= FETCH BRANDS =================
+  // ================= FETCH FILTER DATA =================
   useEffect(() => {
     const fetchFilters = async () => {
       try {
@@ -42,52 +44,68 @@ const Products = () => {
     fetchFilters();
   }, []);
 
-  // ================= LOAD PRODUCTS PROGRESSIVELY =================
+  // ================= FETCH PRODUCTS =================
   useEffect(() => {
-    let isMounted = true;
+    const fetchProducts = async () => {
+      try {
+        const hasFilter =
+          selectedBrands.length > 0 ||
+          selectedCategories.length > 0 ||
+          appliedMin ||
+          appliedMax;
 
-    const fetchAllProducts = async () => {
-      let pageIndex = 0;
+        let url = "";
 
-      while (true) {
-        try {
-          const res = await fetch(
-            `http://localhost:8080/api/v1/products/detail?page=${pageIndex}`
-          );
-
-          const data = await res.json();
-
-          if (!data.products || data.products.length === 0) break;
-
-          const mapped = data.products.map((item) => ({
-            id: item.id,
-            name: item.name,
-            price: item.variants?.[0]?.price || 0,
-            brand: item.brand?.name || "",
-            category: item.categories?.[0]?.name || "",
-            image: item.images?.[0]?.imageUrl || "",
-          }));
-
-          if (!isMounted) break;
-
-          setAllProducts((prev) => [...prev, ...mapped]);
-
-          pageIndex++;
-        } catch (err) {
-          console.error(err);
-          break;
+        // ===== NO FILTER =====
+        if (!hasFilter) {
+          url = `http://localhost:8080/api/v1/products/detail?page=${page - 1}`;
         }
+        // ===== HAS FILTER =====
+        else {
+          const params = new URLSearchParams();
+
+          if (selectedBrands.length > 0) {
+            selectedBrands.forEach((id) => params.append("brands", id));
+          }
+
+          if (selectedCategories.length > 0) {
+            selectedCategories.forEach((id) => params.append("categories", id));
+          }
+
+          if (appliedMin) params.append("minPrice", appliedMin);
+          if (appliedMax) params.append("maxPrice", appliedMax);
+
+          params.append("page", page - 1);
+
+          url = `http://localhost:8080/api/v1/products/filter?${params.toString()}`;
+        }
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const productList = data.products || data.content || [];
+
+        setProducts(productList);
+      } catch (err) {
+        console.error(err);
       }
     };
 
-    fetchAllProducts();
+    fetchProducts();
+  }, [selectedBrands, selectedCategories, appliedMin, appliedMax, page]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // ================= RESET PAGE =================
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategories, selectedBrands, appliedMin, appliedMax]);
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [page]);
 
-  // ================= FILTER =================
+  // ================= TOGGLE MULTI =================
   const toggleCheckbox = (value, list, setList) => {
     if (list.includes(value)) {
       setList(list.filter((v) => v !== value));
@@ -96,31 +114,11 @@ const Products = () => {
     }
   };
 
-  const filtered = allProducts.filter((p) => {
-    if (selectedCategories.length && !selectedCategories.includes(p.category))
-      return false;
-
-    if (selectedBrands.length && !selectedBrands.includes(p.brand))
-      return false;
-
-    if (minPrice && p.price < Number(minPrice)) return false;
-    if (maxPrice && p.price > Number(maxPrice)) return false;
-
-    return true;
-  });
-
-  // ================= RESET PAGE WHEN FILTER =================
-  useEffect(() => {
-    setPage(1);
-  }, [selectedCategories, selectedBrands, minPrice, maxPrice]);
-
-  // ================= PAGINATION =================
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-
-  const displayProducts = filtered.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  // ================= APPLY PRICE =================
+  const applyPrice = () => {
+    setAppliedMin(minPrice);
+    setAppliedMax(maxPrice);
+  };
 
   // ================= RENDER =================
   return (
@@ -131,45 +129,65 @@ const Products = () => {
 
         {/* CATEGORY */}
         <div className="filter-group">
-          <p>Category</p>
-          {categories.map((cat) => (
-            <label key={cat.id} className="filter-item">
-              <input
-                type="checkbox"
-                checked={selectedCategories.includes(cat.name)}
-                onChange={() =>
-                  toggleCheckbox(
-                    cat.name,
-                    selectedCategories,
-                    setSelectedCategories
-                  )
-                }
-              />
-              <span>{cat.name}</span>
-            </label>
-          ))}
+          <div className="filter-header">
+            <p>Category</p>
+            <button
+              className="clear-btn"
+              onClick={() => setSelectedCategories([])}
+            >
+              Uncheck all
+            </button>
+          </div>
+          <div className="filter-list">
+            {categories.map((cat) => (
+              <label key={cat.id} className="filter-item">
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(cat.id)}
+                  onChange={() =>
+                    toggleCheckbox(
+                      cat.id,
+                      selectedCategories,
+                      setSelectedCategories,
+                    )
+                  }
+                />
+                <span>{cat.name}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* BRAND */}
         <div className="filter-group">
-          <p>Brand</p>
-          {brands.map((brand) => (
-            <label key={brand.id} className="filter-item">
-              <input
-                type="checkbox"
-                checked={selectedBrands.includes(brand.name)}
-                onChange={() =>
-                  toggleCheckbox(brand.name, selectedBrands, setSelectedBrands)
-                }
-              />
-              <span>{brand.name}</span>
-            </label>
-          ))}
+          <div class="filter-header">
+            <p>Brand</p>
+            <button
+              className="clear-btn"
+              onClick={() => setSelectedCategories([])}
+            >
+              Uncheck all
+            </button>
+          </div>
+          <div className="filter-list">
+            {brands.map((brand) => (
+              <label key={brand.id} className="filter-item">
+                <input
+                  type="checkbox"
+                  checked={selectedBrands.includes(brand.id)}
+                  onChange={() =>
+                    toggleCheckbox(brand.id, selectedBrands, setSelectedBrands)
+                  }
+                />
+                <span>{brand.name}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* PRICE */}
         <div className="filter-group">
-          <p>Price</p>
+          <p>Price (VND)</p>
           <div className="price-inputs">
             <input
               type="number"
@@ -185,44 +203,103 @@ const Products = () => {
               onChange={(e) => setMaxPrice(e.target.value)}
             />
           </div>
+
+          <button
+            onClick={applyPrice}
+            style={{
+              marginTop: "10px",
+              width: "100%",
+              padding: "6px",
+              borderRadius: "6px",
+              border: "none",
+              background: "#fff",
+              color: "#000",
+              cursor: "pointer",
+            }}
+          >
+            Apply
+          </button>
         </div>
       </div>
 
       {/* PRODUCTS */}
       <div className="products-content">
         <div className="featured-grid">
-          {displayProducts.map((item) => (
-            <div
-              key={item.id}
-              className="product-card"
-              onClick={() => navigate(`/product/${item.id}`)}
-            >
-              <div className="product-image">
-                <img src={item.image} alt={item.name} />
-              </div>
+          {products.length === 0 ? (
+            <div className="no-product">Không có sản phẩm phù hợp</div>
+          ) : (
+            products.map((item) => {
+              const image = item.images?.[0]?.imageUrl;
+              const price = item.variants?.[0]?.price || 0;
 
-              <div className="product-info">
-                <h3 className="product-name">{item.name}</h3>
+              return (
+                <div
+                  key={item.id}
+                  className="card-wrapper"
+                  onClick={() => navigate(`/product/detail/${item.id}`)}
+                >
+                  <div className="card-container">
+                    <div
+                      className="card-top"
+                      style={{ backgroundImage: `url(${image})` }}
+                    />
 
-                <div className="product-bottom">
-                  <p className="price">{item.price.toLocaleString()} ₫</p>
+                    <div className="card-bottom">
+                      <div className="card-left">
+                        <div className="card-details">
+                          <h1>{item.name}</h1>
+                          <p>{price.toLocaleString()} ₫</p>
+                        </div>
 
-                  <button
-                    className="cart-icon-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      console.log("Add to cart", item);
-                    }}
+                        <div
+                          className="card-buy"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log("Add to cart", item);
+                          }}
+                        >
+                          <ShoppingCart size={18} />
+                        </div>
+                      </div>
+
+                      <div className="card-right">
+                        <div className="card-done">✔</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="card-inside"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <ShoppingCart size={18} />
-                  </button>
+                    <div className="card-icon">ℹ</div>
+
+                    <div className="card-contents">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <th>Category</th>
+                            <td>{item.categories?.[0]?.name || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <th>Brand</th>
+                            <td>{item.brand || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <th>Price</th>
+                            <td>{price.toLocaleString()} ₫</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          )}
         </div>
 
-        {/* PAGINATION (ONLY CURRENT PAGE) */}
+        {/* PAGINATION */}
         <div className="pagination">
           <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
             Prev
@@ -230,12 +307,7 @@ const Products = () => {
 
           <span>{page}</span>
 
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </button>
+          <button onClick={() => setPage((p) => p + 1)}>Next</button>
         </div>
       </div>
     </div>
