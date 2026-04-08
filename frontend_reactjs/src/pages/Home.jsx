@@ -24,7 +24,7 @@ const Home = () => {
         );
 
         const data = await res.json();
-        console.log("API:", data);
+        // console.log("API:", data);
 
         if (Array.isArray(data)) {
           setFeatured(data);
@@ -39,25 +39,46 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (item, e) => {
+  const handleAddToCart = async (item, e) => {
     e.stopPropagation();
 
-    const product = {
-      id: item.id,
-      name: item.name,
-      price: item.variants?.[0]?.price || 0,
-      image: item.images?.[0]?.imageUrl || null,
-      variantId: item.variants?.[0]?.id || null,
+    const sessionId = localStorage.getItem("sessionId");
+
+    const payload = {
+      productId: item.id, 
+      quantity: 1,
+      sessionId: sessionId || null,
+
     };
 
-    addToCart(product, 1);
+    try {
+      const res = await fetch("http://localhost:8080/api/v1/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(sessionId && { "X-Session-Id": sessionId }),
+        },
+        body: JSON.stringify(payload),
+      });
 
-    toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
-      action: {
-        label: "Xem giỏ hàng",
-        onClick: () => navigate("/cart"),
-      },
-    });
+      const data = await res.json();
+
+      // lấy sessionId từ header nếu backend trả về
+      const newSessionId = res.headers.get("X-Session-Id");
+      if (newSessionId) {
+        localStorage.setItem("sessionId", newSessionId);
+      }
+
+      toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
+        action: {
+          label: "Xem giỏ hàng",
+          onClick: () => navigate("/cart"),
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Thêm vào giỏ hàng thất bại");
+    }
   };
 
   return (

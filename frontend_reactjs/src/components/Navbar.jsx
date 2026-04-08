@@ -1,17 +1,28 @@
 import React from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, LogOut, Settings, UserCircle } from "lucide-react"; // Thêm UserCircle icon
-import { useCart } from "../context/CartContext"; 
+import {
+  Search,
+  ShoppingCart,
+  User,
+  LogOut,
+  Settings,
+  UserCircle,
+} from "lucide-react"; // Thêm UserCircle icon
+import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 function Navbar() {
-  const { cartItems } = useCart();
-  const { user, logout } = useAuth(); 
+  const { cart } = useCart();
+
+  const cartItems = cart?.items || [];
+
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -20,9 +31,10 @@ function Navbar() {
   return (
     <nav className="navbar-wrapper slide-down">
       <div className="navbar-container">
-        
         <div className="navbar-left">
-          <Link to="/" className="navbar-logo">SHOP RUNNER</Link>
+          <Link to="/" className="navbar-logo">
+            SHOP RUNNER
+          </Link>
         </div>
 
         <div className="navbar-center">
@@ -34,10 +46,20 @@ function Navbar() {
 
         <div className="navbar-right">
           <div className="navbar-links">
-            <NavLink to="/" className={({ isActive }) => (isActive ? "navlink active" : "navlink")}>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "navlink active" : "navlink"
+              }
+            >
               Trang chủ
             </NavLink>
-            <NavLink to="/products" className={({ isActive }) => (isActive ? "navlink active" : "navlink")}>
+            <NavLink
+              to="/products"
+              className={({ isActive }) =>
+                isActive ? "navlink active" : "navlink"
+              }
+            >
               Sản phẩm
             </NavLink>
           </div>
@@ -56,7 +78,7 @@ function Navbar() {
                   <User size={20} />
                   <span className="user-name">{user.name}</span>
                 </div>
-                
+
                 {/* MENU DROP DOWN */}
                 <div className="user-dropdown">
                   {/* Trang thông tin cá nhân dành cho mọi tài khoản đăng nhập */}
@@ -70,8 +92,11 @@ function Navbar() {
                       <Settings size={16} /> Trang quản trị
                     </Link>
                   )}
-                  
-                  <button onClick={handleLogout} className="dropdown-item logout-btn">
+
+                  <button
+                    onClick={handleLogout}
+                    className="dropdown-item logout-btn"
+                  >
                     <LogOut size={16} /> Đăng xuất
                   </button>
                 </div>

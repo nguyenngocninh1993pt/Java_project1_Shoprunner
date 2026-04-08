@@ -1,72 +1,123 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("cartItems");
-    if (stored) setCartItems(JSON.parse(stored));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const addToCart = async (product, quantity = 1) => {
+  // =========================
+  // FETCH CART
+  // =========================
+  const fetchCart = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          productId: product.id,
-          variantId: product.variantId,
-          quantity: quantity,
-        }),
-      });
+      const sessionId = localStorage.getItem("sessionId");
 
-      if (!res.ok) throw new Error("Add to cart failed");
+      const res = await fetch(
+        `http://localhost:8080/api/v1/cart?sessionId=${sessionId || ""}`,
+        {
+          headers: {
+            ...(sessionId && { "X-Session-Id": sessionId }),
+          },
+        },
+      );
 
       const data = await res.json();
-
-      setCartItems(data);
+      setCart(data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  // =========================
+  // ADD TO CART
+  // =========================
+  const addToCart = async (product, quantity = 1) => {
+    try {
+      const sessionId = localStorage.getItem("sessionId");
+
+      const payload = {
+        productId: product.id,
+        productVariantId: product.variantId,
+        quantity,
+        sessionId: sessionId || null,
+      };
+
+      const res = await fetch("http://localhost:8080/api/v1/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(sessionId && { "X-Session-Id": sessionId }),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      // lưu sessionId nếu backend trả về
+      const newSessionId = res.headers.get("X-Session-Id");
+      if (newSessionId) {
+        localStorage.setItem("sessionId", newSessionId);
+      }
+
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const clearCart = () => setCartItems([]);
+  // =========================
+  // UPDATE ITEM
+  // =========================
+  const updateQuantity = async (cartItemId, quantity) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ quantity }),
+        },
+      );
 
-  const updateQuantity = (id, quantity) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item,
-      ),
-    );
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0,
-  );
+  // =========================
+  // REMOVE ITEM
+  // =========================
+  const removeFromCart = async (cartItemId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const clearCart = () => setCart(null);
 
   return (
     <CartContext.Provider
       value={{
-        cartItems,
+        cart,
+        fetchCart,
         addToCart,
+        updateQuantity,
         removeFromCart,
         clearCart,
-        updateQuantity,
-        totalPrice,
       }}
     >
       {children}

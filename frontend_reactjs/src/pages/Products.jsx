@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
+import { useCart } from "../context/CartContext";
 import "./Products.css";
 
 const Products = () => {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+
+  const [activeId, setActiveId] = useState(null);
 
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
@@ -15,7 +19,6 @@ const Products = () => {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  // 👉 giá dùng để gọi API (chỉ update khi bấm Apply)
   const [appliedMin, setAppliedMin] = useState("");
   const [appliedMax, setAppliedMax] = useState("");
 
@@ -56,12 +59,9 @@ const Products = () => {
 
         let url = "";
 
-        // ===== NO FILTER =====
         if (!hasFilter) {
           url = `http://localhost:8080/api/v1/products/detail?page=${page - 1}`;
-        }
-        // ===== HAS FILTER =====
-        else {
+        } else {
           const params = new URLSearchParams();
 
           if (selectedBrands.length > 0) {
@@ -98,6 +98,7 @@ const Products = () => {
   useEffect(() => {
     setPage(1);
   }, [selectedCategories, selectedBrands, appliedMin, appliedMax]);
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -105,7 +106,6 @@ const Products = () => {
     });
   }, [page]);
 
-  // ================= TOGGLE MULTI =================
   const toggleCheckbox = (value, list, setList) => {
     if (list.includes(value)) {
       setList(list.filter((v) => v !== value));
@@ -114,13 +114,11 @@ const Products = () => {
     }
   };
 
-  // ================= APPLY PRICE =================
   const applyPrice = () => {
     setAppliedMin(minPrice);
     setAppliedMax(maxPrice);
   };
 
-  // ================= RENDER =================
   return (
     <div className="products-layout">
       {/* SIDEBAR */}
@@ -138,6 +136,7 @@ const Products = () => {
               Uncheck all
             </button>
           </div>
+
           <div className="filter-list">
             {categories.map((cat) => (
               <label key={cat.id} className="filter-item">
@@ -160,15 +159,13 @@ const Products = () => {
 
         {/* BRAND */}
         <div className="filter-group">
-          <div class="filter-header">
+          <div className="filter-header">
             <p>Brand</p>
-            <button
-              className="clear-btn"
-              onClick={() => setSelectedCategories([])}
-            >
+            <button className="clear-btn" onClick={() => setSelectedBrands([])}>
               Uncheck all
             </button>
           </div>
+
           <div className="filter-list">
             {brands.map((brand) => (
               <label key={brand.id} className="filter-item">
@@ -244,18 +241,38 @@ const Products = () => {
                       style={{ backgroundImage: `url(${image})` }}
                     />
 
-                    <div className="card-bottom">
+                    <div
+                      className={`card-bottom ${activeId === item.id ? "clicked" : ""}`}
+                    >
                       <div className="card-left">
                         <div className="card-details">
                           <h1>{item.name}</h1>
                           <p>{price.toLocaleString()} ₫</p>
                         </div>
 
+                        {/* ADD TO CART */}
                         <div
                           className="card-buy"
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log("Add to cart", item);
+
+                            const defaultVariant = item.variants?.[0];
+
+                            if (!defaultVariant) {
+                              alert("Sản phẩm chưa có biến thể");
+                              return;
+                            }
+
+                            addToCart(
+                              {
+                                id: item.id,
+                                variantId: defaultVariant.id,
+                              },
+                              1,
+                            );
+
+                            setActiveId(item.id);
+                            setTimeout(() => setActiveId(null), 1500);
                           }}
                         >
                           <ShoppingCart size={18} />
