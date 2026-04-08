@@ -262,3 +262,14 @@ input[type="number"] {
 .pd-buy-btn:hover {
   transform: scale(1.05);
 }
+.pd-desc-content img {
+  max-width: 70%;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+}
+
+.pd-desc-content {
+  overflow: hidden;
+  word-break: break-word;
+}

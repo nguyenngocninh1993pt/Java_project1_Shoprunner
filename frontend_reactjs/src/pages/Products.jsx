@@ -236,7 +236,7 @@ const Products = () => {
                 <div
                   key={item.id}
                   className="card-wrapper"
-                  onClick={() => navigate(`/product/detail/${item.id}`)}
+                  onClick={() => navigate(`/products/detail/${item.id}`)}
                 >
                   <div className="card-container">
                     <div

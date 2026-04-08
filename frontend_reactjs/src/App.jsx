@@ -24,11 +24,11 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
 
-// --- CÁC COMPONENT ADMIN --- 
+// --- CÁC COMPONENT ADMIN ---
 // (Nhớ import đúng đường dẫn nơi bạn đã lưu các file này nhé)
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./components/AdminDashboard";
-import UserManagement from "./components/UserManagement"; 
+import UserManagement from "./components/UserManagement";
 import AdminProducts from "./components/AdminProducts";
 import AdminOrders from "./components/AdminOrders";
 import AdminSettings from "./components/AdminSettings";
@@ -50,14 +50,13 @@ function App() {
       <CartProvider>
         <Router>
           <Routes>
-            
             {/* 1. KHU VỰC CỦA KHÁCH HÀNG (Sử dụng StoreLayout có Navbar & Footer) */}
             <Route element={<StoreLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
               <Route path="/aboutus" element={<AboutUs />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/products/detail/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-success" element={<OrderSuccess />} />
@@ -72,13 +71,14 @@ function App() {
             {/* 2. KHU VỰC CỦA ADMIN (Sử dụng AdminLayout với Sidebar & Header riêng) */}
             {/* Có thể bọc bằng <ProtectedRoute> sau này để yêu cầu đăng nhập */}
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />          {/* Mặc định vào /admin sẽ hiển thị Dashboard */}
-              <Route path="users" element={<UserManagement />} />   {/* Đường dẫn: /admin/users */}
+              <Route index element={<AdminDashboard />} />{" "}
+              {/* Mặc định vào /admin sẽ hiển thị Dashboard */}
+              <Route path="users" element={<UserManagement />} />{" "}
+              {/* Đường dẫn: /admin/users */}
               <Route path="products" element={<AdminProducts />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
-
           </Routes>
         </Router>
       </CartProvider>
