@@ -1,17 +1,15 @@
 import React from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom"; // Thêm useNavigate
-import { Search, ShoppingCart, User, LogOut, Settings } from "lucide-react"; // Thêm icon
-// Import hook useCart và useAuth
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Search, ShoppingCart, User, LogOut, Settings, UserCircle } from "lucide-react"; // Thêm UserCircle icon
 import { useCart } from "../context/CartContext"; 
-import { useAuth } from "../context/AuthContext" // Giả định bạn đã tạo file này theo hướng dẫn trước
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 function Navbar() {
   const { cartItems } = useCart();
-  const { user, logout } = useAuth(); // Lấy thông tin user và hàm logout
+  const { user, logout } = useAuth(); 
   const navigate = useNavigate();
 
-  // Tính tổng số lượng sản phẩm đang có trong giỏ
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const handleLogout = () => {
@@ -52,7 +50,6 @@ function Navbar() {
               )}
             </NavLink>
 
-            {/* KIỂM TRA ĐĂNG NHẬP ĐỂ HIỂN THỊ GIAO DIỆN PHÙ HỢP */}
             {user ? (
               <div className="user-logged-in">
                 <div className="user-info">
@@ -60,13 +57,20 @@ function Navbar() {
                   <span className="user-name">{user.name}</span>
                 </div>
                 
-                {/* Menu thả xuống khi hover */}
+                {/* MENU DROP DOWN */}
                 <div className="user-dropdown">
+                  {/* Trang thông tin cá nhân dành cho mọi tài khoản đăng nhập */}
+                  <Link to="/profile" className="dropdown-item">
+                    <UserCircle size={16} /> Thông tin cá nhân
+                  </Link>
+
+                  {/* Nút quay lại trang quản trị chỉ dành cho Admin */}
                   {user.role === "admin" && (
                     <Link to="/admin" className="dropdown-item">
-                      <Settings size={16} /> Quản trị
+                      <Settings size={16} /> Trang quản trị
                     </Link>
                   )}
+                  
                   <button onClick={handleLogout} className="dropdown-item logout-btn">
                     <LogOut size={16} /> Đăng xuất
                   </button>

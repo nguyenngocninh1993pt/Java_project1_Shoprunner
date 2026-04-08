@@ -22,6 +22,7 @@ import Policy from "./pages/Policy";
 // Đăng nhập / Đăng ký
 import Login from "./components/Login";
 import Register from "./components/Register";
+import Profile from "./components/Profile";
 
 // --- CÁC COMPONENT ADMIN --- 
 // (Nhớ import đúng đường dẫn nơi bạn đã lưu các file này nhé)
@@ -65,6 +66,7 @@ function App() {
               <Route path="/chinh-sach-bao-mat" element={<Policy />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
 
             {/* 2. KHU VỰC CỦA ADMIN (Sử dụng AdminLayout với Sidebar & Header riêng) */}

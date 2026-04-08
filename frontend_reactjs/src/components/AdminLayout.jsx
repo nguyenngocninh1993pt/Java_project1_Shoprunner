@@ -8,8 +8,7 @@ import {
   Settings,
   LogOut,
   Menu,
-  Bell,
-  Search
+  
 } from "lucide-react";
 import "./AdminLayout.css";
 
@@ -26,8 +25,12 @@ const AdminLayout = () => {
     <div className="admin-container">
       {/* --- SIDEBAR --- */}
       <aside className={`admin-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+        
+        {/* ĐÃ CẬP NHẬT PHẦN LOGO NÀY */}
         <div className="sidebar-logo">
-          <h2>{isSidebarOpen ? "SHOP RUNNER" : "SR"}</h2>
+          <Link to="/" style={{ textDecoration: 'none', color: '#fff' }}>
+            <h2>{isSidebarOpen ? "SHOP RUNNER" : "SR"}</h2>
+          </Link>
         </div>
         
         <nav className="sidebar-nav">
@@ -73,17 +76,10 @@ const AdminLayout = () => {
             >
               <Menu size={24} />
             </button>
-            <div className="search-bar">
-              <Search size={18} className="search-icon" />
-              <input type="text" placeholder="Tìm kiếm đơn hàng, sản phẩm..." />
-            </div>
           </div>
 
           <div className="header-right">
-            <button className="icon-btn notification-btn">
-              <Bell size={20} />
-              <span className="badge">3</span>
-            </button>
+            
             <div className="admin-profile">
               <img 
                 src="https://ui-avatars.com/api/?name=Admin&background=fff&color=000" 
