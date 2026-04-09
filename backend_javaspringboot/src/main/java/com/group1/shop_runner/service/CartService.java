@@ -258,6 +258,7 @@ public class CartService {
 
         if (sessionCart == null) return;
 
+        // ===== CASE 1: USER CHƯA CÓ CART =====
         if (userCart == null) {
             sessionCart.setUser(userRepository.findById(userId).orElseThrow());
             sessionCart.setSessionId(null);
@@ -265,6 +266,7 @@ public class CartService {
             return;
         }
 
+        // ===== CASE 2: MERGE =====
         List<CartItem> sessionItems = cartItemRepository.findByCartId(sessionCart.getId());
         List<CartItem> userItems = cartItemRepository.findByCartId(userCart.getId());
 
@@ -284,6 +286,9 @@ public class CartService {
             }
         }
 
-        cartItemRepository.deleteByCartId(sessionCart.getId());
+        userCart.setUser(userRepository.findById(userId).orElseThrow());
+        cartRepository.save(userCart);
+
+        cartRepository.delete(sessionCart);
     }
 }
