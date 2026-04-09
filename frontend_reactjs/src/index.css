@@ -128,7 +128,7 @@ button {
 /* === SECTION TITLE === */
 .section-title {
   text-align: center;
-  margin: 60px 0 30px;
+  margin: 20px 0 40px;
   animation: fadeUp 0.8s ease-out forwards;
   font-size: 2.5rem;
   font-weight: bold;
@@ -555,7 +555,7 @@ button {
 }
 
 .cart-card:hover {
-  transform: translateY(-4px);
+
   box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
 }
 
@@ -564,6 +564,8 @@ button {
   height: 100px;
   object-fit: cover;
   border-radius: 0.75rem;
+  background: #f5f5f5;
+  cursor: pointer;
 }
 
 .cart-info {
@@ -597,6 +599,7 @@ button {
   padding: 0.3rem 0.5rem;
   cursor: pointer;
   transition: background 0.3s ease;
+  color: aliceblue;
 }
 
 .cart-quantity button:hover {

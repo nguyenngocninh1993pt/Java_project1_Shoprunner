@@ -13,18 +13,19 @@ const getSessionId = () => {
 };
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState(null);
   const navigate = useNavigate();
 
   const sessionId = getSessionId();
 
-  // Load cart từ backend
+  // ================= FETCH CART =================
   const fetchCart = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8080/cart?sessionId=${sessionId}`
+        `http://localhost:8080/api/v1/cart?sessionId=${sessionId}`,
       );
-      setCartItems(res.data);
+
+      setCart(res.data);
     } catch (err) {
       console.error("Fetch cart error:", err);
     }
@@ -34,51 +35,47 @@ const Cart = () => {
     fetchCart();
   }, []);
 
-  // Update quantity
-  const updateQuantity = async (productId, quantity) => {
+  // ================= UPDATE QUANTITY =================
+  const updateQuantity = async (cartItemId, quantity) => {
     try {
-      await axios.put("http://localhost:8080/cart/update", {
-        productId,
+      await axios.put(`http://localhost:8080/api/v1/cart/items/${cartItemId}`, {
         quantity,
-        sessionId,
       });
+
       fetchCart();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Remove item
-  const removeFromCart = async (productId) => {
+  // ================= REMOVE ITEM =================
+  const removeFromCart = async (cartItemId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/cart/remove/${productId}?sessionId=${sessionId}`
+        `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
       );
+
       fetchCart();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Clear cart
+  // ================= CLEAR CART =================
   const clearCart = async () => {
     try {
       await axios.delete(
-        `http://localhost:8080/cart/clear?sessionId=${sessionId}`
+        `http://localhost:8080/api/v1/cart/clear/session?sessionId=${sessionId}`,
       );
+
       fetchCart();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Total price
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-
-  if (cartItems.length === 0)
+  // ================= EMPTY =================
+  if (!cart || cart.items.length === 0)
     return (
       <div className="cart-empty">
         <p>Giỏ hàng trống.</p>
@@ -88,30 +85,58 @@ const Cart = () => {
       </div>
     );
 
+  // ================= TOTAL =================
+  const totalPrice = cart.totalAmount;
+
   return (
     <div className="cart-page">
       <div className="container">
         <h1 className="section-title">Giỏ hàng của bạn</h1>
 
         <div className="cart-items">
-          {cartItems.map((item) => (
-            <div key={item.id} className="cart-card">
-              <img src={item.image} alt={item.name} className="cart-image" />
+          {cart.items.map((item) => (
+            <div key={item.cartItemId} className="cart-card">
+              <img
+                src={item.image}
+                alt={item.productName}
+                onClick={() => navigate(`/products/detail/${item.productId}`)}
+                className="cart-image"
+                onLoad={(e) => {
+                  const img = e.target;
+                  const ratio = img.naturalWidth / img.naturalHeight;
+
+                  if (ratio > 1.5) {
+                    img.style.objectFit = "contain";
+                  }
+                }}
+                onError={(e) => {
+                  e.target.src = "/fallback.png";
+                }}
+              />
 
               <div className="cart-info">
-                <h2>{item.name}</h2>
-                <p className="category">{item.category}</p>
+                <h2>{item.productName}</h2>
+
+                {/* VARIANT */}
+                <p className="variant">
+                  {item.option1Value}
+                  {item.option2Value && ` - ${item.option2Value}`}
+                  {item.option3Value && ` - ${item.option3Value}`}
+                </p>
+
                 <p className="price">{item.price.toLocaleString()} ₫</p>
               </div>
 
+              {/* QUANTITY */}
               <div className="cart-quantity">
                 <button
-                  onClick={() =>
-                    updateQuantity(
-                      item.id,
-                      item.quantity > 1 ? item.quantity - 1 : 1
-                    )
-                  }
+                  onClick={() => {
+                    if (item.quantity === 1) {
+                      removeFromCart(item.cartItemId);
+                    } else {
+                      updateQuantity(item.cartItemId, item.quantity - 1);
+                    }
+                  }}
                 >
                   <Minus size={16} />
                 </button>
@@ -119,28 +144,33 @@ const Cart = () => {
                 <span>{item.quantity}</span>
 
                 <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  onClick={() =>
+                    updateQuantity(item.cartItemId, item.quantity + 1)
+                  }
                 >
                   <Plus size={16} />
                 </button>
               </div>
 
+              {/* REMOVE */}
               <button
                 className="cart-remove"
-                onClick={() => removeFromCart(item.id)}
+                onClick={() => removeFromCart(item.cartItemId)}
               >
                 <Trash2 size={20} />
               </button>
             </div>
           ))}
 
+          {/* TOTAL */}
           <div className="cart-total">
             <h2>Tổng tiền:</h2>
             <p>{totalPrice.toLocaleString()} ₫</p>
           </div>
 
+          {/* ACTION */}
           <div className="cart-actions">
-            <button className="btn btn-red" onClick={clearCart}>
+            <button className="btn" onClick={clearCart}>
               Xóa tất cả
             </button>
             <Link to="/checkout" className="btn">

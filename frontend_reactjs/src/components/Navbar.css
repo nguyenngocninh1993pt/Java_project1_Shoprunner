@@ -329,3 +329,6 @@
 .user-logged-in:hover .user-info {
   color: white;
 }
+.navbar-actions .lucide-shopping-cart{
+  color: #d1d5db;
+}
