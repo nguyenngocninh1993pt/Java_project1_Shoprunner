@@ -22,9 +22,10 @@ const Login = () => {
         password,
       });
 
-      const { token, username, role } = response.data;
+      const { id, token, username, role } = response.data;
 
       const userData = {
+        id,
         username,
         email,
         role,

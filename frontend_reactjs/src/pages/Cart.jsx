@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
 const getSessionId = () => {
@@ -15,25 +16,43 @@ const getSessionId = () => {
 const Cart = () => {
   const [cart, setCart] = useState(null);
   const navigate = useNavigate();
-
-  const sessionId = getSessionId();
+  const { user } = useAuth();
+  const sessionId = user?.id ? null : getSessionId();
 
   // ================= FETCH CART =================
   const fetchCart = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:8080/api/v1/cart?sessionId=${sessionId}`,
-      );
+      const token = localStorage.getItem("token");
+      let url = "";
 
+      if (user?.id) {
+        url = `http://localhost:8080/api/v1/cart`;
+      } else {
+        url = `http://localhost:8080/api/v1/cart?sessionId=${sessionId}`;
+      }
+
+      const res = await axios.get(url, {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+      });
+
+      // console.log("CART:", res.data);
       setCart(res.data);
     } catch (err) {
       console.error("Fetch cart error:", err);
+      console.error("FULL ERROR:", err);
+      console.error("RESPONSE:", err.response);
     }
   };
 
   useEffect(() => {
+    if (user === undefined) return;
+
     fetchCart();
-  }, []);
+  }, [user]);
 
   // ================= UPDATE QUANTITY =================
   const updateQuantity = async (cartItemId, quantity) => {
@@ -64,9 +83,15 @@ const Cart = () => {
   // ================= CLEAR CART =================
   const clearCart = async () => {
     try {
-      await axios.delete(
-        `http://localhost:8080/api/v1/cart/clear/session?sessionId=${sessionId}`,
-      );
+      if (user?.id) {
+        await axios.delete(
+          `http://localhost:8080/api/v1/cart/clear/user?userId=${user.id}`,
+        );
+      } else {
+        await axios.delete(
+          `http://localhost:8080/api/v1/cart/clear/session?sessionId=${sessionId}`,
+        );
+      }
 
       fetchCart();
     } catch (err) {
@@ -75,7 +100,7 @@ const Cart = () => {
   };
 
   // ================= EMPTY =================
-  if (!cart || cart.items.length === 0)
+  if (!cart || !cart.items || cart.items.length === 0)
     return (
       <div className="cart-empty">
         <p>Giỏ hàng trống.</p>
