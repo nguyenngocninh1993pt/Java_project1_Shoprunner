@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "../api/axiosClient";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import {
   User,
   Package,
@@ -17,8 +18,8 @@ import "./Profile.css";
 const Profile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  const [activeTab, setActiveTab] = useState("info");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || "info");
 
   const API_URL = "http://localhost:8080/api/v1/customer-profiles";
 
@@ -33,17 +34,38 @@ const Profile = () => {
 
   const [profileId, setProfileId] = useState(null);
   const [orders, setOrders] = useState([]);
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state]);
 
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        if (!user?.id) return;
+        const res = await axios.get(
+          `http://localhost:8080/api/v1/orders/user/${user.id}`,
+        );
+        console.log("ORDERS DATA:", JSON.stringify(res.data, null, 2)); // ← thêm
+        setOrders(res.data);
+      } catch (err) {
+        console.log("LOAD ORDERS ERROR:", err);
+      }
+    };
+
+    if (activeTab === "orders") {
+      fetchOrders();
+    }
+  }, [activeTab, user]);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         if (!user?.id) return;
-
         const res = await axios.get(`${API_URL}/user/${user.id}`);
         const data = res.data;
 
         setProfileId(data.id);
-
         setFormData({
           name: data.fullName || "",
           email: data.email || user?.email || "",
@@ -126,15 +148,34 @@ const Profile = () => {
     navigate("/login");
   };
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "PAID":
+        return "Đã thanh toán";
+      case "SHIP_COD":
+        return "Chờ giao hàng (COD) - Thanh toán khi nhận hàng";
+      case "SHIPPING":
+        return "Chờ giao hàng";
+      case "DELIVERED":
+        return "Đã giao hàng";
+      case "CANCELLED":
+        return "Đã hủy";
+      default:
+        return status;
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
-      case "Chờ xác nhận":
-        return { bg: "rgba(250, 204, 21, 0.2)", color: "#facc15" };
-      case "Đang giao hàng":
+      case "PAID":
         return { bg: "rgba(96, 165, 250, 0.2)", color: "#60a5fa" };
-      case "Hoàn thành":
+      case "SHIP_COD":
+        return { bg: "rgba(250, 204, 21, 0.2)", color: "#facc15" };
+      case "SHIPPING":
+        return { bg: "rgba(251, 146, 60, 0.2)", color: "#fb923c" };
+      case "DELIVERED":
         return { bg: "rgba(74, 222, 128, 0.2)", color: "#4ade80" };
-      case "Đã hủy":
+      case "CANCELLED":
         return { bg: "rgba(248, 113, 113, 0.2)", color: "#f87171" };
       default:
         return { bg: "#333", color: "#fff" };
@@ -283,10 +324,88 @@ const Profile = () => {
           {activeTab === "orders" && (
             <div className="tab-pane slide-up">
               <h2 className="tab-title">Lịch sử mua hàng</h2>
-              <div className="empty-orders">
-                <Package size={50} color="#555" />
-                <p>Chưa có đơn hàng</p>
-              </div>
+
+              {orders.length === 0 ? (
+                <div className="empty-orders">
+                  <Package size={50} color="#555" />
+                  <p>Chưa có đơn hàng</p>
+                </div>
+              ) : (
+                <div className="orders-list">
+                  {orders.map((order) => {
+                    const statusStyle = getStatusColor(order.status);
+                    return (
+                      <div key={order.id} className="order-card">
+                        <div className="order-card-header">
+                          <span className="order-id">
+                            ID đơn hàng: {order.id} -{" "}
+                          </span>
+                          <span
+                            className="order-status"
+                            style={{
+                              background: statusStyle.bg,
+                              color: statusStyle.color,
+                            }}
+                          >
+                            Trạng thái: {getStatusLabel(order.status)}
+                          </span>
+                        </div>
+
+                        <div className="order-card-body">
+                          {order.receiverName && (
+                            <p>
+                              <User size={14} /> Tên người nhận:{" "}
+                              {order.receiverName}
+                            </p>
+                          )}
+                          <p>
+                            <MapPin size={14} /> Địa chỉ giao hàng:{" "}
+                            {order.shippingAddress}
+                          </p>
+                          <p>
+                            <Phone size={14} /> Số điện thoại:{" "}
+                            {order.phoneNumber}
+                          </p>
+                          <p>
+                            Ngày đặt:{" "}
+                            {new Date(order.createdAt).toLocaleString("vi-VN")}
+                          </p>
+
+                          {/* Danh sách sản phẩm */}
+                          {order.items && order.items.length > 0 && (
+                            <div className="order-items-list">
+                              <p className="order-items-title">
+                                Danh sách sản phẩm:
+                              </p>
+                              {order.items.map((item, idx) => (
+                                <div key={idx} className="order-item-row">
+                                  <span className="order-item-name">
+                                    {item.productName}
+                                  </span>
+                                  <div className="order-item-right">
+                                    <span className="order-item-qty">
+                                      x{item.quantity}
+                                    </span>
+                                    <span className="order-item-price">
+                                      {item.price?.toLocaleString()} ₫
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="order-card-footer">
+                          <span className="order-total">
+                            Tổng: {order.totalPrice?.toLocaleString()} ₫
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>

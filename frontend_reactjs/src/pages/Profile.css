@@ -6,7 +6,7 @@
 }
 
 .profile-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   gap: 30px;
@@ -201,6 +201,25 @@
 }
 
 /* BẢNG LỊCH SỬ ĐƠN HÀNG */
+.order-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s;
+}
+
+.order-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.order-card-header{
+  font-size: 1.6rem;
+  padding-bottom: 10px;
+}
+.order-card-body p{
+  margin: 12px 0;
+}
 .orders-table {
   width: 100%;
   border-collapse: collapse;
@@ -222,8 +241,12 @@
   font-size: 0.95rem;
 }
 
-.fw-bold { font-weight: 600; }
-.text-green { color: #4ade80; }
+.fw-bold {
+  font-weight: 600;
+}
+.text-green {
+  color: #4ade80;
+}
 
 .status-badge {
   padding: 6px 12px;
@@ -292,10 +315,67 @@
   color: #666;
   cursor: not-allowed;
 }
+.order-items-list {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
+.order-items-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #aaa;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 12px;
+}
+
+.order-item-row:last-child {
+  border-bottom: none;
+}
+
+.order-item-name {
+  flex: 1;
+  font-size: 14px;
+  color: #ddd;
+}
+
+.order-item-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.order-item-qty {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.order-item-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive cơ bản */

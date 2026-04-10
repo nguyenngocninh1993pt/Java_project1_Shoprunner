@@ -42,32 +42,14 @@ const Home = () => {
   const handleAddToCart = async (item, e) => {
     e.stopPropagation();
 
-    const sessionId = localStorage.getItem("sessionId");
-
-    const payload = {
-      productId: item.id, 
-      quantity: 1,
-      sessionId: sessionId || null,
-
-    };
-
     try {
-      const res = await fetch("http://localhost:8080/api/v1/cart/items", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(sessionId && { "X-Session-Id": sessionId }),
+      await addToCart(
+        {
+          id: item.id,
+          variantId: item.variants?.[0]?.id || null, 
         },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      // lấy sessionId từ header nếu backend trả về
-      const newSessionId = res.headers.get("X-Session-Id");
-      if (newSessionId) {
-        localStorage.setItem("sessionId", newSessionId);
-      }
+        1,
+      );
 
       toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
         action: {

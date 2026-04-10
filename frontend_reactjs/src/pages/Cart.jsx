@@ -15,6 +15,7 @@ const getSessionId = () => {
 };
 
 const Cart = () => {
+  
   const navigate = useNavigate();
   const { user } = useAuth();
   const { cart, fetchCart, updateQuantity, removeFromCart, clearCart } = useCart(); // ← dùng từ context
@@ -26,7 +27,6 @@ const Cart = () => {
   }, [user]);
 
   // ================= CLEAR CART =================
-  // clearCart trong context chỉ set null, cần override để gọi API
   const handleClearCart = async () => {
     try {
       if (user?.id) {

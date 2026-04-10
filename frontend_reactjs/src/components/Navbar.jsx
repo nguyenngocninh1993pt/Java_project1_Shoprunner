@@ -7,6 +7,7 @@ import {
   LogOut,
   Settings,
   UserCircle,
+  Package,
 } from "lucide-react"; // Thêm UserCircle icon
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -83,8 +84,19 @@ function Navbar() {
                 {/* MENU DROP DOWN */}
                 <div className="user-dropdown">
                   {/* Trang thông tin cá nhân dành cho mọi tài khoản đăng nhập */}
-                  <Link to="/profile" className="dropdown-item">
+                  <Link
+                    to="/profile"
+                    state={{ tab: "info" }}
+                    className="dropdown-item"
+                  >
                     <UserCircle size={16} /> Thông tin cá nhân
+                  </Link>
+                  <Link
+                    to="/profile"
+                    state={{ tab: "orders" }}
+                    className="dropdown-item"
+                  >
+                    <Package size={16} /> Lịch sử đơn hàng
                   </Link>
 
                   {/* Nút quay lại trang quản trị chỉ dành cho Admin */}

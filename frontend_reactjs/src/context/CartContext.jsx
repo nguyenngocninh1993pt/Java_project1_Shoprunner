@@ -46,6 +46,7 @@ export const CartProvider = ({ children }) => {
   // =========================
   const addToCart = async (product, quantity = 1) => {
     try {
+      const token = localStorage.getItem("token");
       const sessionId = localStorage.getItem("sessionId");
       const payload = {
         productId: product.id,
@@ -57,6 +58,7 @@ export const CartProvider = ({ children }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
           ...(sessionId && { "X-Session-Id": sessionId }),
         },
         body: JSON.stringify(payload),
@@ -77,12 +79,14 @@ export const CartProvider = ({ children }) => {
   // =========================
   const updateQuantity = async (cartItemId, quantity) => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
           },
           body: JSON.stringify({ quantity }),
         },
@@ -99,10 +103,14 @@ export const CartProvider = ({ children }) => {
   // =========================
   const removeFromCart = async (cartItemId) => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
         {
           method: "DELETE",
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
         },
       );
       const data = await res.json();

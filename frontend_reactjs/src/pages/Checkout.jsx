@@ -57,7 +57,7 @@ const Checkout = () => {
       setLoadingProfile(false);
     }
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, phone, address, paymentMethod } = form;
 
@@ -66,19 +66,41 @@ const Checkout = () => {
       return;
     }
 
-    const order = {
-      customer: { name, email, phone, address },
-      items: cartItems,
-      total: totalPrice,
-      paymentMethod,
-      date: new Date().toLocaleString(),
-    };
+    try {
+      await axios.post(
+        "http://localhost:8080/api/v1/orders/checkout",
+        {
+          userId: user.id,
+          shippingAddress: address,
+          phoneNumber: phone,
+          paymentMethod: paymentMethod,
+          receiverName: name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
 
-    toast.success(
-      `Thanh toán thành công bằng phương thức: ${paymentMethod.toUpperCase()}`,
-    );
-    navigate("/order-success", { state: { order } });
-    clearCart();
+      clearCart();
+
+      toast.success(`Đặt hàng thành công!`);
+      navigate("/order-success", {
+        state: {
+          order: {
+            customer: { name, email, phone, address },
+            items: cartItems,
+            total: totalPrice,
+            paymentMethod,
+            date: new Date().toLocaleString(),
+          },
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Đặt hàng thất bại, vui lòng thử lại.");
+    }
   };
 
   if (!cartItems || cartItems.length === 0)

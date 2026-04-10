@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Các components Layout & chung
 import Navbar from "./components/Navbar";
@@ -49,6 +50,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          <ScrollToTop />
           <Routes>
             {/* 1. KHU VỰC CỦA KHÁCH HÀNG (Sử dụng StoreLayout có Navbar & Footer) */}
             <Route element={<StoreLayout />}>
