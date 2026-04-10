@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, User, UserPlus, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  UserPlus,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import axios from "axios";
 import "./Login.css";
 
@@ -41,7 +48,6 @@ const Register = () => {
       setTimeout(() => {
         navigate("/login");
       }, 2000);
-
     } catch (error) {
       console.error(error);
 
@@ -49,7 +55,6 @@ const Register = () => {
         type: "error",
         text: error.response?.data || "Đăng ký thất bại!",
       });
-
     } finally {
       setIsLoading(false);
     }

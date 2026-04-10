@@ -22,7 +22,7 @@ import Policy from "./pages/Policy";
 // Đăng nhập / Đăng ký
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Profile from "./components/Profile";
+import Profile from "./pages/Profile";
 
 // --- CÁC COMPONENT ADMIN ---
 // (Nhớ import đúng đường dẫn nơi bạn đã lưu các file này nhé)

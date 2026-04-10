@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import axios from "axios";
 
 const getSessionId = () => {
@@ -14,74 +15,19 @@ const getSessionId = () => {
 };
 
 const Cart = () => {
-  const [cart, setCart] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { cart, fetchCart, updateQuantity, removeFromCart, clearCart } = useCart(); // ← dùng từ context
   const sessionId = user?.id ? null : getSessionId();
-
-  // ================= FETCH CART =================
-  const fetchCart = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      let url = "";
-
-      if (user?.id) {
-        url = `http://localhost:8080/api/v1/cart`;
-      } else {
-        url = `http://localhost:8080/api/v1/cart?sessionId=${sessionId}`;
-      }
-
-      const res = await axios.get(url, {
-        headers: token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : {},
-      });
-
-      // console.log("CART:", res.data);
-      setCart(res.data);
-    } catch (err) {
-      console.error("Fetch cart error:", err);
-      console.error("FULL ERROR:", err);
-      console.error("RESPONSE:", err.response);
-    }
-  };
 
   useEffect(() => {
     if (user === undefined) return;
-
     fetchCart();
   }, [user]);
 
-  // ================= UPDATE QUANTITY =================
-  const updateQuantity = async (cartItemId, quantity) => {
-    try {
-      await axios.put(`http://localhost:8080/api/v1/cart/items/${cartItemId}`, {
-        quantity,
-      });
-
-      fetchCart();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // ================= REMOVE ITEM =================
-  const removeFromCart = async (cartItemId) => {
-    try {
-      await axios.delete(
-        `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
-      );
-
-      fetchCart();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   // ================= CLEAR CART =================
-  const clearCart = async () => {
+  // clearCart trong context chỉ set null, cần override để gọi API
+  const handleClearCart = async () => {
     try {
       if (user?.id) {
         await axios.delete(
@@ -92,8 +38,7 @@ const Cart = () => {
           `http://localhost:8080/api/v1/cart/clear/session?sessionId=${sessionId}`,
         );
       }
-
-      fetchCart();
+      fetchCart(); // ← fetch lại để đồng bộ context
     } catch (err) {
       console.error(err);
     }
@@ -110,7 +55,6 @@ const Cart = () => {
       </div>
     );
 
-  // ================= TOTAL =================
   const totalPrice = cart.totalAmount;
 
   return (
@@ -129,10 +73,7 @@ const Cart = () => {
                 onLoad={(e) => {
                   const img = e.target;
                   const ratio = img.naturalWidth / img.naturalHeight;
-
-                  if (ratio > 1.5) {
-                    img.style.objectFit = "contain";
-                  }
+                  if (ratio > 1.5) img.style.objectFit = "contain";
                 }}
                 onError={(e) => {
                   e.target.src = "/fallback.png";
@@ -141,14 +82,11 @@ const Cart = () => {
 
               <div className="cart-info">
                 <h2>{item.productName}</h2>
-
-                {/* VARIANT */}
                 <p className="variant">
                   {item.option1Value}
                   {item.option2Value && ` - ${item.option2Value}`}
                   {item.option3Value && ` - ${item.option3Value}`}
                 </p>
-
                 <p className="price">{item.price.toLocaleString()} ₫</p>
               </div>
 
@@ -157,9 +95,9 @@ const Cart = () => {
                 <button
                   onClick={() => {
                     if (item.quantity === 1) {
-                      removeFromCart(item.cartItemId);
+                      removeFromCart(item.cartItemId); // ← từ context
                     } else {
-                      updateQuantity(item.cartItemId, item.quantity - 1);
+                      updateQuantity(item.cartItemId, item.quantity - 1); // ← từ context
                     }
                   }}
                 >
@@ -169,9 +107,7 @@ const Cart = () => {
                 <span>{item.quantity}</span>
 
                 <button
-                  onClick={() =>
-                    updateQuantity(item.cartItemId, item.quantity + 1)
-                  }
+                  onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} // ← từ context
                 >
                   <Plus size={16} />
                 </button>
@@ -180,7 +116,7 @@ const Cart = () => {
               {/* REMOVE */}
               <button
                 className="cart-remove"
-                onClick={() => removeFromCart(item.cartItemId)}
+                onClick={() => removeFromCart(item.cartItemId)} // ← từ context
               >
                 <Trash2 size={20} />
               </button>
@@ -195,7 +131,7 @@ const Cart = () => {
 
           {/* ACTION */}
           <div className="cart-actions">
-            <button className="btn" onClick={clearCart}>
+            <button className="btn" onClick={handleClearCart}>
               Xóa tất cả
             </button>
             <button

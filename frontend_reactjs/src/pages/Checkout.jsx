@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import axios from "axios";
+import "./Checkout.css";
 
 const Checkout = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-
-  const sessionId = localStorage.getItem("sessionId");
+  const { cart, clearCart, fetchCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  const cartItems = cart?.items || [];
+  const totalPrice = cart?.totalAmount || 0;
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -18,26 +24,50 @@ const Checkout = () => {
     postal: "",
     paymentMethod: "cod",
   });
+  const handleUseMyInfo = async () => {
+    if (!user?.id) return;
 
+    try {
+      setLoadingProfile(true);
+
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/customer-profiles/user/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
+      const data = res.data;
+
+      setForm((prev) => ({
+        ...prev,
+        name: data.fullName || "",
+        phone: data.phoneNumber || "",
+        address: data.address || "",
+        email: data.email || user.email || "",
+      }));
+
+      toast.success("Đã tải thông tin của bạn!");
+    } catch (err) {
+      console.log(err);
+      toast.error("Không lấy được thông tin khách hàng");
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, email, phone, address, city, postal, paymentMethod } = form;
+    const { name, email, phone, address, paymentMethod } = form;
 
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !address ||
-      !city ||
-      !postal ||
-      !paymentMethod
-    ) {
+    if (!name || !email || !phone || !address || !paymentMethod) {
       toast.error("Vui lòng điền đầy đủ thông tin.");
       return;
     }
 
     const order = {
-      customer: { name, email, phone, address, city, postal },
+      customer: { name, email, phone, address },
       items: cartItems,
       total: totalPrice,
       paymentMethod,
@@ -50,28 +80,7 @@ const Checkout = () => {
     navigate("/order-success", { state: { order } });
     clearCart();
   };
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        if (!sessionId) return;
 
-        const res = await fetch(
-          `http://localhost:8080/api/v1/cart?sessionId=${sessionId}`,
-        );
-
-        if (!res.ok) throw new Error("Fetch cart failed");
-
-        const data = await res.json();
-
-        setCartItems(data.items || []);
-        setTotalPrice(data.totalAmount || 0);
-      } catch (err) {
-        console.error("Fetch cart error:", err);
-      }
-    };
-
-    fetchCart();
-  }, [sessionId]);
   if (!cartItems || cartItems.length === 0)
     return (
       <div className="cart-empty">
@@ -89,34 +98,39 @@ const Checkout = () => {
         <div className="checkout-grid">
           {/* Form khách hàng */}
           <form className="checkout-form" onSubmit={handleSubmit}>
-            <h2>Thông tin khách hàng</h2>
+            <div className="form-header">
+              <h2>Thông tin khách hàng</h2>
+
+              <button
+                type="button"
+                className="use-info-btn"
+                onClick={handleUseMyInfo}
+                disabled={loadingProfile}
+              >
+                {loadingProfile ? "Đang tải..." : "Sử dụng thông tin của tôi"}
+              </button>
+            </div>
             <div className="form-grid">
-              {["name", "email", "phone", "address", "city", "postal"].map(
-                (field, idx) => (
-                  <input
-                    key={idx}
-                    type={field === "email" ? "email" : "text"}
-                    placeholder={
-                      field === "name"
-                        ? "Họ và tên"
-                        : field === "email"
-                          ? "Email"
-                          : field === "phone"
-                            ? "Số điện thoại"
-                            : field === "address"
-                              ? "Địa chỉ"
-                              : field === "city"
-                                ? "Thành phố / Tỉnh"
-                                : "Mã bưu điện"
-                    }
-                    value={form[field]}
-                    onChange={(e) =>
-                      setForm({ ...form, [field]: e.target.value })
-                    }
-                    className="form-input"
-                  />
-                ),
-              )}
+              {["name", "email", "phone", "address"].map((field, idx) => (
+                <input
+                  key={idx}
+                  type={field === "email" ? "email" : "text"}
+                  placeholder={
+                    field === "name"
+                      ? "Họ và tên"
+                      : field === "email"
+                        ? "Email"
+                        : field === "phone"
+                          ? "Số điện thoại"
+                          : "Địa chỉ"
+                  }
+                  value={form[field]}
+                  onChange={(e) =>
+                    setForm({ ...form, [field]: e.target.value })
+                  }
+                  className="form-input"
+                />
+              ))}
             </div>
 
             <div className="payment-methods">
@@ -151,17 +165,13 @@ const Checkout = () => {
                 <div key={item.cartItemId} className="order-item">
                   <div className="order-left">
                     <img src={item.image} alt={item.productName} />
-
                     <div>
                       <p>{item.productName}</p>
-
-                      {/* VARIANT */}
                       <p className="variant">
                         {item.option1Value}
                         {item.option2Value && ` - ${item.option2Value}`}
                         {item.option3Value && ` - ${item.option3Value}`}
                       </p>
-
                       <p>
                         {item.quantity} x {item.price.toLocaleString()} ₫
                       </p>

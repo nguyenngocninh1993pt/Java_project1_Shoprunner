@@ -1,26 +1,29 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
+  const { user } = useAuth();
 
   // =========================
   // FETCH CART
   // =========================
   const fetchCart = async () => {
     try {
+      const token = localStorage.getItem("token");
       const sessionId = localStorage.getItem("sessionId");
 
       const res = await fetch(
         `http://localhost:8080/api/v1/cart?sessionId=${sessionId || ""}`,
         {
           headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
             ...(sessionId && { "X-Session-Id": sessionId }),
           },
         },
       );
-
       const data = await res.json();
       setCart(data);
     } catch (err) {
@@ -28,20 +31,28 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Re-fetch
+  useEffect(() => {
+    if (user === undefined) return;
+    if (user === null) {
+      setCart(null);
+      return;
+    }
+    fetchCart();
+  }, [user]);
+
   // =========================
   // ADD TO CART
   // =========================
   const addToCart = async (product, quantity = 1) => {
     try {
       const sessionId = localStorage.getItem("sessionId");
-
       const payload = {
         productId: product.id,
         productVariantId: product.variantId,
         quantity,
         sessionId: sessionId || null,
       };
-
       const res = await fetch("http://localhost:8080/api/v1/cart/items", {
         method: "POST",
         headers: {
@@ -50,15 +61,11 @@ export const CartProvider = ({ children }) => {
         },
         body: JSON.stringify(payload),
       });
-
       const data = await res.json();
-
-      // lưu sessionId nếu backend trả về
       const newSessionId = res.headers.get("X-Session-Id");
       if (newSessionId) {
         localStorage.setItem("sessionId", newSessionId);
       }
-
       setCart(data);
     } catch (err) {
       console.error(err);
@@ -80,7 +87,6 @@ export const CartProvider = ({ children }) => {
           body: JSON.stringify({ quantity }),
         },
       );
-
       const data = await res.json();
       setCart(data);
     } catch (err) {
@@ -99,7 +105,6 @@ export const CartProvider = ({ children }) => {
           method: "DELETE",
         },
       );
-
       const data = await res.json();
       setCart(data);
     } catch (err) {
