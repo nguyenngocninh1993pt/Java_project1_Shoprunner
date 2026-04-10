@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
     @Override
     public UserDetails loadUserByUsername(String username) {
 
-        System.out.println("LOAD USER BY USERNAME: " + username);
+//        System.out.println("LOAD USER BY USERNAME: " + username);
 
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> {
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
                     return new RuntimeException("User not found");
                 });
 
-        System.out.println("FOUND USER: " + user.getEmail());
+//        System.out.println("FOUND USER: " + user.getEmail());
 
         return new CustomUserDetails(user);
     }

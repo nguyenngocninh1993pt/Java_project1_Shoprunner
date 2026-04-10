@@ -3,8 +3,10 @@ package com.group1.shop_runner.service;
 import com.group1.shop_runner.config.JwtUtil;
 import com.group1.shop_runner.dto.auth.request.RegisterRequest;
 import com.group1.shop_runner.dto.auth.response.LoginResponse;
+import com.group1.shop_runner.entity.CustomerProfile;
 import com.group1.shop_runner.entity.Role;
 import com.group1.shop_runner.entity.User;
+import com.group1.shop_runner.repository.CustomerProfileRepository;
 import com.group1.shop_runner.repository.RoleRepository;
 import com.group1.shop_runner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class AuthService {
     private JwtUtil jwtUtil;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private CustomerProfileRepository customerProfileRepository;
 
     public LoginResponse login(String email, String password) {
         User user = userRepository.findByEmail(email)
@@ -72,6 +76,21 @@ public class AuthService {
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);
+        // CREATE PROFILE
+        User savedUser = userRepository.save(user);
+        CustomerProfile profile = new CustomerProfile();
+        profile.setUser(savedUser);
+
+        profile.setFullName("");
+        profile.setAddress("");
+        profile.setPhoneNumber("");
+        profile.setGender("");
+        profile.setDob(null);
+
+        profile.setCreatedAt(LocalDateTime.now());
+        profile.setUpdatedAt(LocalDateTime.now());
+
+        customerProfileRepository.save(profile);
 
         return "Register success";
     }

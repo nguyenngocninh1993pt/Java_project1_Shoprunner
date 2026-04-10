@@ -34,7 +34,7 @@ public class CustomerProfileService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        customerProfileRepository.findByUserId(request.getUserId())
+        customerProfileRepository.findByUser_Id(request.getUserId())
                 .ifPresent(profile -> {
                     throw new AppException(ErrorCode.CUSTOMER_PROFILE_ALREADY_EXISTS);
                 });
@@ -70,7 +70,7 @@ public class CustomerProfileService {
     public CustomerProfileResponse getCustomerProfileById(Long id) {
         CustomerProfile profile = customerProfileRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_PROFILE_NOT_FOUND));
-
+        System.out.println("GET PROFILE ID = " + id);
         return mapToResponse(profile);
     }
 
@@ -78,7 +78,7 @@ public class CustomerProfileService {
     // API 4: Lấy customer profile theo userId
     // =========================================================
     public CustomerProfileResponse getCustomerProfileByUserId(Long userId) {
-        CustomerProfile profile = customerProfileRepository.findByUserId(userId)
+        CustomerProfile profile = customerProfileRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_PROFILE_NOT_FOUND));
 
         return mapToResponse(profile);
@@ -129,5 +129,12 @@ public class CustomerProfileService {
                 profile.getPhoneNumber(),
                 profile.getGender()
         );
+    }
+    //lay profile theo user_id
+    public CustomerProfileResponse getByUserId(Long userId) {
+        CustomerProfile profile = customerProfileRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_PROFILE_NOT_FOUND));
+
+        return mapToResponse(profile);
     }
 }
