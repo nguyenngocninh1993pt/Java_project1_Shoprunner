@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   Search,
   ShoppingCart,
@@ -23,6 +23,7 @@ function Navbar() {
   );
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -102,7 +103,11 @@ function Navbar() {
                 </div>
               </div>
             ) : (
-              <Link to="/login" className="login-button">
+              <Link
+                to="/login"
+                className="login-button"
+                state={{ from: location.pathname }}
+              >
                 <User size={20} />
                 <span>Đăng nhập</span>
               </Link>

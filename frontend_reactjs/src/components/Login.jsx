@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Lock, LogIn } from "lucide-react";
 import axios from "axios";
@@ -10,13 +10,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      console.log("Email:", email);
-      console.log("Password:", password);
       const response = await axios.post("http://localhost:8080/auth/login", {
         email,
         password,
@@ -39,7 +38,8 @@ const Login = () => {
       if (role === "admin") {
         navigate("/admin");
       } else {
-        navigate("/");
+        const from = location.state?.from || "/";
+        navigate(from);
       }
     } catch (error) {
       console.error(error);

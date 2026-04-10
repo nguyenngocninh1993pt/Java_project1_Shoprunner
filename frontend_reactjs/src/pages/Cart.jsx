@@ -198,9 +198,18 @@ const Cart = () => {
             <button className="btn" onClick={clearCart}>
               Xóa tất cả
             </button>
-            <Link to="/checkout" className="btn">
+            <button
+              className="btn"
+              onClick={() => {
+                if (!user?.id) {
+                  navigate("/login", { state: { from: "/cart" } });
+                } else {
+                  navigate("/checkout");
+                }
+              }}
+            >
               Thanh toán
-            </Link>
+            </button>
           </div>
         </div>
       </div>
