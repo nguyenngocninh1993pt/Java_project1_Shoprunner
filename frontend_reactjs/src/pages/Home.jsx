@@ -46,7 +46,7 @@ const Home = () => {
       await addToCart(
         {
           id: item.id,
-          variantId: item.variants?.[0]?.id || null, 
+          variantId: item.variants?.[0]?.id || null,
         },
         1,
       );
@@ -69,11 +69,12 @@ const Home = () => {
       <section className="hero-section">
         <video
           className="hero-video"
-          src="banner1.mp4"
+          src="banner3.mp4"
           autoPlay
           loop
           muted
           playsInline
+          type="video/mp4"
         />
         <div className="hero-overlay">
           <h1 className="hero-title">Just Feel The Power</h1>
