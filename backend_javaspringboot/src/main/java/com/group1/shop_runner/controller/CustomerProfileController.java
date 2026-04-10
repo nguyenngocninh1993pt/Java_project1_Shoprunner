@@ -48,8 +48,8 @@ public class CustomerProfileController {
     // GET /api/v1/customer-profiles/user/{userId}
     // =========================================================
     @GetMapping("/user/{userId}")
-    public CustomerProfileResponse getCustomerProfileByUserId(@PathVariable Long userId) {
-        return customerProfileService.getCustomerProfileByUserId(userId);
+    public CustomerProfileResponse getByUserId(@PathVariable Long userId) {
+        return customerProfileService.getByUserId(userId);
     }
 
     // =========================================================
@@ -71,4 +71,5 @@ public class CustomerProfileController {
         customerProfileService.deleteCustomerProfile(id);
         return "Delete customer profile successfully";
     }
+
 }

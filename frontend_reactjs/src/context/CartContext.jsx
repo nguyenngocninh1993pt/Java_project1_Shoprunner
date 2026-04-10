@@ -1,62 +1,136 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState(null);
+  const { user } = useAuth();
 
+  // =========================
+  // FETCH CART
+  // =========================
+  const fetchCart = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const sessionId = localStorage.getItem("sessionId");
+
+      const res = await fetch(
+        `http://localhost:8080/api/v1/cart?sessionId=${sessionId || ""}`,
+        {
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...(sessionId && { "X-Session-Id": sessionId }),
+          },
+        },
+      );
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Re-fetch
   useEffect(() => {
-    const stored = localStorage.getItem("cartItems");
-    if (stored) setCartItems(JSON.parse(stored));
-  }, []);
+    if (user === undefined) return;
+    if (user === null) {
+      setCart(null);
+      return;
+    }
+    fetchCart();
+  }, [user]);
 
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const addToCart = (product, quantity = 1) => {
-    setCartItems((prev) => {
-      const exist = prev.find((item) => item.id === product.id);
-      if (exist) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      } else {
-        return [...prev, { ...product, quantity }];
+  // =========================
+  // ADD TO CART
+  // =========================
+  const addToCart = async (product, quantity = 1) => {
+    try {
+      const token = localStorage.getItem("token");
+      const sessionId = localStorage.getItem("sessionId");
+      const payload = {
+        productId: product.id,
+        productVariantId: product.variantId,
+        quantity,
+        sessionId: sessionId || null,
+      };
+      const res = await fetch("http://localhost:8080/api/v1/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+          ...(sessionId && { "X-Session-Id": sessionId }),
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      const newSessionId = res.headers.get("X-Session-Id");
+      if (newSessionId) {
+        localStorage.setItem("sessionId", newSessionId);
       }
-    });
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  // =========================
+  // UPDATE ITEM
+  // =========================
+  const updateQuantity = async (cartItemId, quantity) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({ quantity }),
+        },
+      );
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const clearCart = () => setCartItems([]);
-
-  const updateQuantity = (id, quantity) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-      )
-    );
+  // =========================
+  // REMOVE ITEM
+  // =========================
+  const removeFromCart = async (cartItemId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `http://localhost:8080/api/v1/cart/items/${cartItemId}`,
+        {
+          method: "DELETE",
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        },
+      );
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  const clearCart = () => setCart(null);
 
   return (
     <CartContext.Provider
       value={{
-        cartItems,
+        cart,
+        fetchCart,
         addToCart,
+        updateQuantity,
         removeFromCart,
         clearCart,
-        updateQuantity,
-        totalPrice,
       }}
     >
       {children}

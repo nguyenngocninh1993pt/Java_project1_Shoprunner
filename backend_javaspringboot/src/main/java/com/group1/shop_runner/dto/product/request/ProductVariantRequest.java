@@ -14,16 +14,14 @@ public class ProductVariantRequest {
     @NotBlank(message = "Information is required")
     private String option1Value;
 
-    @NotBlank(message = "Information is required")
     private String option2Value;
+    private String option3Value;
 
     @NotNull(message = "Information is required")
     private BigDecimal price;
 
     @NotNull(message = "Information is required")
     private Integer stock;
+    private String sku;
 
-    public String getOption3Value() {
-        return getOption3Value();
-    }
 }

@@ -10,7 +10,8 @@ import com.group1.shop_runner.repository.RoleRepository;
 import com.group1.shop_runner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.group1.shop_runner.repository.CustomerProfileRepository;
+import com.group1.shop_runner.entity.CustomerProfile;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CustomerProfileRepository customerProfileRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -38,13 +42,35 @@ public class UserService {
 
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword()); // sau này sẽ hash
+        user.setPassword(request.getPassword());
         user.setEmail(request.getEmail());
         user.setRole(role);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
         User saved = userRepository.save(user);
+
+        // =========================================
+        // AUTO CREATE CUSTOMER PROFILE
+        // =========================================
+        if (saved.getRole() != null &&
+                saved.getRole().getName().equalsIgnoreCase("USER")) {
+            System.out.println("ROLE = " + saved.getRole().getName());
+            CustomerProfile profile = new CustomerProfile();
+
+            profile.setUser(saved);
+
+            profile.setFullName("");
+            profile.setAddress("");
+            profile.setPhoneNumber("");
+            profile.setGender("");
+            profile.setDob(null);
+
+            profile.setCreatedAt(LocalDateTime.now());
+            profile.setUpdatedAt(LocalDateTime.now());
+
+            customerProfileRepository.save(profile);
+        }
 
         return mapToResponse(saved);
     }

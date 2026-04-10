@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Lock, LogIn } from "lucide-react";
+import axios from "axios";
 import "./Login.css";
 
 const Login = () => {
@@ -9,22 +10,43 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let userData = null;
-    if (email === "admin@gmail.com" && password === "123") {
-      userData = { email, role: "admin", name: "Quản trị viên" };
-    } else if (email === "user@gmail.com" && password === "123") {
-      userData = { email, role: "user", name: "Khách hàng" };
-    }
+    try {
+      const response = await axios.post("http://localhost:8080/auth/login", {
+        email,
+        password,
+      });
 
-    if (userData) {
+      const { id, token, username, role } = response.data;
+
+      const userData = {
+        id,
+        username,
+        email,
+        role,
+        token,
+      };
+
       login(userData);
-      userData.role === "admin" ? navigate("/admin") : navigate("/");
-    } else {
-      alert("Thông tin đăng nhập không chính xác!");
+      localStorage.setItem("token", token);
+
+      // redirect
+      if (role === "admin") {
+        navigate("/admin");
+      } else {
+        const from = location.state?.from || "/";
+        navigate(from);
+      }
+    } catch (error) {
+      console.error(error);
+
+      const message = error.response?.data?.message || "Đăng nhập thất bại!";
+
+      alert(message);
     }
   };
 

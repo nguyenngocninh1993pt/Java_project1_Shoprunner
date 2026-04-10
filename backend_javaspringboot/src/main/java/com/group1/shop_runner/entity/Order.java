@@ -33,6 +33,9 @@ public class Order {
     @Column(length = 20, nullable = false)
     private OrderStatus status;
 
+    @Column(name = "receiver_name", length = 255)
+    private String receiverName;
+
     @Column(name = "shipping_address", length = 500)
     private String shippingAddress;
 

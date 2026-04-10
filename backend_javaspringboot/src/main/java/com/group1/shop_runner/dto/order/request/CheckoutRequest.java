@@ -9,4 +9,6 @@ public class CheckoutRequest {
     private Long userId;
     private String shippingAddress;
     private String phoneNumber;
+    private String paymentMethod;
+    private String receiverName;
 }

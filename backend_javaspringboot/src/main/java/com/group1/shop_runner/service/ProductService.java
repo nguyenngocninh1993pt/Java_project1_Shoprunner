@@ -16,6 +16,7 @@ import com.group1.shop_runner.repository.*;
 import com.group1.shop_runner.shared.exception.AppException;
 import com.group1.shop_runner.shared.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -133,6 +134,7 @@ public class ProductService {
         variant.setOption3Value(request.getOption3Value());
         variant.setPrice(request.getPrice());
         variant.setStock(request.getStock());
+        variant.setSku(request.getSku());
 
         ProductVariant savedVariant = productVariantRepository.save(variant);
 
@@ -176,6 +178,7 @@ public class ProductService {
         variant.setOption3Value(request.getOption3Value());
         variant.setPrice(request.getPrice());
         variant.setStock(request.getStock());
+        variant.setSku(request.getSku());
 
         ProductVariant updatedVariant = productVariantRepository.save(variant);
 
@@ -382,6 +385,58 @@ public class ProductService {
                 .map(ProductResponse::getId)
                 .toList();
 
+        var images = productImageRepository.getImagesByProductIds(ids);
+        var variants = productVariantRepository.getVariantsByProductIds(ids);
+        var categories = categoryRepository.getByProductIds(ids);
+
+        Map<Long, List<ProductImageDto>> imageMap =
+                images.stream().collect(Collectors.groupingBy(ProductImageDto::getProductId));
+
+        Map<Long, List<ProductVariantDto>> variantMap =
+                variants.stream().collect(Collectors.groupingBy(ProductVariantDto::getProductId));
+
+        Map<Long, List<CategoryDto>> categoryMap =
+                categories.stream().collect(Collectors.groupingBy(CategoryDto::getProductId));
+
+        for (ProductResponse p : products) {
+            p.setImages(imageMap.getOrDefault(p.getId(), List.of()));
+            p.setVariants(variantMap.getOrDefault(p.getId(), List.of()));
+            p.setCategories(categoryMap.getOrDefault(p.getId(), List.of()));
+        }
+
+        return products;
+    }
+    //3.4 lay product detail theo filter
+    @Transactional(readOnly = true)
+    public List<ProductResponse> filterProducts(
+            List<Long> brandIds,
+            List<Long> categoryIds,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 20);
+
+        if (brandIds != null && brandIds.isEmpty()) brandIds = null;
+        if (categoryIds != null && categoryIds.isEmpty()) categoryIds = null;
+
+        Page<ProductResponse> productPage = productRepository.filterProducts(
+                brandIds,
+                categoryIds,
+                minPrice,
+                maxPrice,
+                pageable
+        );
+
+        List<ProductResponse> products = productPage.getContent();
+
+        if (products.isEmpty()) return List.of();
+
+        List<Long> ids = products.stream()
+                .map(ProductResponse::getId)
+                .toList();
+
+        // ================= LOAD EXTRA DATA =================
         var images = productImageRepository.getImagesByProductIds(ids);
         var variants = productVariantRepository.getVariantsByProductIds(ids);
         var categories = categoryRepository.getByProductIds(ids);

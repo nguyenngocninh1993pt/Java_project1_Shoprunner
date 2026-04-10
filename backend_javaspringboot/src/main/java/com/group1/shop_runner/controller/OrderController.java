@@ -74,4 +74,10 @@ public class OrderController {
     public void cancelOrder(@PathVariable Integer orderId) {
         orderService.cancelOrder(orderId);
     }
+    // API 6: Lấy tất cả đơn hàng (Admin)
+// GET /api/v1/orders
+    @GetMapping
+    public List<OrderListResponse> getAllOrders() {
+        return orderService.getAllOrders();
+    }
 }

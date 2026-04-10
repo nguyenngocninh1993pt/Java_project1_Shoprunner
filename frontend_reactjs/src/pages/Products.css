@@ -4,6 +4,7 @@
   gap: 40px;
   padding: 30px 5%;
   background: #0f0f0f;
+  margin-top: 60px;
   color: #fff;
 }
 
@@ -22,7 +23,23 @@
   margin-bottom: 20px;
   color: #fff;
 }
+.filter-group {
+  margin-bottom: 50px;
+  max-height: 200px;
+  padding-right: 5px;
+}
+.filter-group::-webkit-scrollbar {
+  width: 6px;
+}
 
+.filter-group::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+.filter-group::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
 .filter-group p {
   font-weight: 600;
   margin-bottom: 10px;
@@ -160,4 +177,85 @@
 .pagination button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-inputs input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #111;
+  color: #fff;
+  outline: none;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+/* focus */
+.price-inputs input:focus {
+  border-color: #666;
+  background: #181818;
+}
+
+/* placeholder */
+.price-inputs input::placeholder {
+  color: #666;
+}
+/* LIST SCROLL (chỉ scroll phần list, không scroll cả group) */
+.filter-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* SCROLLBAR */
+.filter-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-list::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+.filter-list::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* HEADER: title + button cùng hàng */
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* TITLE */
+.filter-header p {
+  margin: 0;
+  font-weight: 600;
+  color: #ccc;
+}
+
+/* BUTTON */
+.clear-btn {
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.clear-btn:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.product-cart-icon {
+  color: #000;
 }

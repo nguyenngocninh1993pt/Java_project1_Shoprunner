@@ -24,7 +24,7 @@ const Home = () => {
         );
 
         const data = await res.json();
-        console.log("API:", data);
+        // console.log("API:", data);
 
         if (Array.isArray(data)) {
           setFeatured(data);
@@ -39,25 +39,28 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (item, e) => {
+  const handleAddToCart = async (item, e) => {
     e.stopPropagation();
 
-    const product = {
-      id: item.id,
-      name: item.name,
-      price: item.variants?.[0]?.price || 0,
-      image: item.images?.[0]?.imageUrl || null,
-      variantId: item.variants?.[0]?.id || null,
-    };
+    try {
+      await addToCart(
+        {
+          id: item.id,
+          variantId: item.variants?.[0]?.id || null, 
+        },
+        1,
+      );
 
-    addToCart(product, 1);
-
-    toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
-      action: {
-        label: "Xem giỏ hàng",
-        onClick: () => navigate("/cart"),
-      },
-    });
+      toast.success(`Đã thêm ${item.name} vào giỏ hàng!`, {
+        action: {
+          label: "Xem giỏ hàng",
+          onClick: () => navigate("/cart"),
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Thêm vào giỏ hàng thất bại");
+    }
   };
 
   return (

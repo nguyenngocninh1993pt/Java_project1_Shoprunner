@@ -1,11 +1,20 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import axios from "axios";
+import "./Checkout.css";
 
 const Checkout = () => {
-  const { cartItems, clearCart, totalPrice } = useCart();
+  const { cart, clearCart, fetchCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  const cartItems = cart?.items || [];
+  const totalPrice = cart?.totalAmount || 0;
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -15,34 +24,92 @@ const Checkout = () => {
     postal: "",
     paymentMethod: "cod",
   });
+  const handleUseMyInfo = async () => {
+    if (!user?.id) return;
 
-  const handleSubmit = (e) => {
+    try {
+      setLoadingProfile(true);
+
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/customer-profiles/user/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
+      const data = res.data;
+
+      setForm((prev) => ({
+        ...prev,
+        name: data.fullName || "",
+        phone: data.phoneNumber || "",
+        address: data.address || "",
+        email: data.email || user.email || "",
+      }));
+
+      toast.success("Đã tải thông tin của bạn!");
+    } catch (err) {
+      console.log(err);
+      toast.error("Không lấy được thông tin khách hàng");
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, phone, address, city, postal, paymentMethod } = form;
+    const { name, email, phone, address, paymentMethod } = form;
 
-    if (!name || !email || !phone || !address || !city || !postal || !paymentMethod) {
+    if (!name || !email || !phone || !address || !paymentMethod) {
       toast.error("Vui lòng điền đầy đủ thông tin.");
       return;
     }
 
-    const order = {
-      customer: { name, email, phone, address, city, postal },
-      items: cartItems,
-      total: totalPrice,
-      paymentMethod,
-      date: new Date().toLocaleString(),
-    };
+    try {
+      await axios.post(
+        "http://localhost:8080/api/v1/orders/checkout",
+        {
+          userId: user.id,
+          shippingAddress: address,
+          phoneNumber: phone,
+          paymentMethod: paymentMethod,
+          receiverName: name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
 
-    toast.success(`Thanh toán thành công bằng phương thức: ${paymentMethod.toUpperCase()}`);
-    navigate("/order-success", { state: { order } });
-    clearCart();
+      clearCart();
+
+      toast.success(`Đặt hàng thành công!`);
+      navigate("/order-success", {
+        state: {
+          order: {
+            customer: { name, email, phone, address },
+            items: cartItems,
+            total: totalPrice,
+            paymentMethod,
+            date: new Date().toLocaleString(),
+          },
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Đặt hàng thất bại, vui lòng thử lại.");
+    }
   };
 
-  if (cartItems.length === 0)
+  if (!cartItems || cartItems.length === 0)
     return (
       <div className="cart-empty">
         <p>Giỏ hàng trống.</p>
-        <button className="btn" onClick={() => navigate("/products")}>Quay lại cửa hàng</button>
+        <button className="btn" onClick={() => navigate("/products")}>
+          Quay lại cửa hàng
+        </button>
       </div>
     );
 
@@ -53,21 +120,36 @@ const Checkout = () => {
         <div className="checkout-grid">
           {/* Form khách hàng */}
           <form className="checkout-form" onSubmit={handleSubmit}>
-            <h2>Thông tin khách hàng</h2>
+            <div className="form-header">
+              <h2>Thông tin khách hàng</h2>
+
+              <button
+                type="button"
+                className="use-info-btn"
+                onClick={handleUseMyInfo}
+                disabled={loadingProfile}
+              >
+                {loadingProfile ? "Đang tải..." : "Sử dụng thông tin của tôi"}
+              </button>
+            </div>
             <div className="form-grid">
-              {["name","email","phone","address","city","postal"].map((field,idx) => (
+              {["name", "email", "phone", "address"].map((field, idx) => (
                 <input
                   key={idx}
-                  type={field==="email"?"email":"text"}
+                  type={field === "email" ? "email" : "text"}
                   placeholder={
-                    field==="name"?"Họ và tên":
-                    field==="email"?"Email":
-                    field==="phone"?"Số điện thoại":
-                    field==="address"?"Địa chỉ":
-                    field==="city"?"Thành phố / Tỉnh":"Mã bưu điện"
+                    field === "name"
+                      ? "Họ và tên"
+                      : field === "email"
+                        ? "Email"
+                        : field === "phone"
+                          ? "Số điện thoại"
+                          : "Địa chỉ"
                   }
                   value={form[field]}
-                  onChange={(e)=>setForm({...form,[field]:e.target.value})}
+                  onChange={(e) =>
+                    setForm({ ...form, [field]: e.target.value })
+                  }
                   className="form-input"
                 />
               ))}
@@ -77,38 +159,46 @@ const Checkout = () => {
               <h3>Phương thức thanh toán</h3>
               <div className="payment-grid">
                 {[
-                  {id:"cod",label:"COD"},
-                  {id:"bank",label:"Chuyển khoản ngân hàng"},
-                  {id:"card",label:"Thẻ tín dụng / Thẻ ghi nợ"}
-                ].map((m)=>
+                  { id: "cod", label: "COD" },
+                  { id: "bank", label: "Chuyển khoản ngân hàng" },
+                  { id: "card", label: "Thẻ tín dụng / Thẻ ghi nợ" },
+                ].map((m) => (
                   <div
                     key={m.id}
-                    className={`payment-card ${form.paymentMethod===m.id?"active":""}`}
-                    onClick={()=>setForm({...form,paymentMethod:m.id})}
+                    className={`payment-card ${form.paymentMethod === m.id ? "active" : ""}`}
+                    onClick={() => setForm({ ...form, paymentMethod: m.id })}
                   >
                     {m.label}
                   </div>
-                )}
+                ))}
               </div>
             </div>
 
-            <button type="submit" className="btn mt-4">Thanh toán</button>
+            <button type="submit" className="btn mt-4">
+              Thanh toán
+            </button>
           </form>
 
           {/* Chi tiết đơn hàng */}
           <div className="order-summary">
             <h2>Đơn hàng của bạn</h2>
             <div className="order-items">
-              {cartItems.map((item,idx)=>(
-                <div key={item.id} className="order-item">
+              {cartItems.map((item) => (
+                <div key={item.cartItemId} className="order-item">
                   <div className="order-left">
-                    <img src={item.image} alt={item.name} />
+                    <img src={item.image} alt={item.productName} />
                     <div>
-                      <p>{item.name}</p>
-                      <p>{item.quantity} x {item.price.toLocaleString()} ₫</p>
+                      <p>{item.productName}</p>
+                      <p className="variant">
+                        {item.option1Value}
+                        {item.option2Value && ` - ${item.option2Value}`}
+                        {item.option3Value && ` - ${item.option3Value}`}
+                      </p>
+                      <p>
+                        {item.quantity} x {item.price.toLocaleString()} ₫
+                      </p>
                     </div>
                   </div>
-                  <p className="order-price">{(item.price*item.quantity).toLocaleString()} ₫</p>
                 </div>
               ))}
             </div>
