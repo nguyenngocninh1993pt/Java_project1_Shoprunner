@@ -33,13 +33,15 @@ import UserManagement from "./components/UserManagement";
 import AdminProducts from "./pages/Admin/AdminProducts";
 import AdminOrders from "./pages/Admin/AdminOrders";
 import AdminSettings from "./pages/Admin/AdminSettings";
+import AdminCustomers from "./pages/Admin/AdminCustomer";
+import AdminCustomerDetail from "./pages/Admin/AdminCustomerDetail";
 
 // Tạo một Layout riêng cho trang khách hàng (Chứa Navbar và Footer)
 const StoreLayout = () => {
   return (
     <>
       <Navbar />
-      <Outlet /> {/* Nơi hiển thị các trang con như Home, Products... */}
+      <Outlet /> 
       <Footer />
     </>
   );
@@ -78,6 +80,8 @@ function App() {
               <Route path="users" element={<UserManagement />} />{" "}
               {/* Đường dẫn: /admin/users */}
               <Route path="products" element={<AdminProducts />} />
+              <Route path="customers" element={<AdminCustomers />} />
+              <Route path="customers/:id" element={<AdminCustomerDetail />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
