@@ -40,6 +40,7 @@ public class AuthService {
         );
 
         return new LoginResponse(
+                user.getId(),
                 token,
                 user.getUsername(),
                 user.getRole().getName()

@@ -14,12 +14,20 @@ import org.springframework.stereotype.Service;
         @Autowired
         private UserRepository userRepository;
 
-        @Override
-        public UserDetails loadUserByUsername(String username) {
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    @Override
+    public UserDetails loadUserByUsername(String username) {
 
-            return new CustomUserDetails(user);
-        }
+        System.out.println("LOAD USER BY USERNAME: " + username);
+
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> {
+                    System.out.println(" USER NOT FOUND IN DB");
+                    return new RuntimeException("User not found");
+                });
+
+        System.out.println("FOUND USER: " + user.getEmail());
+
+        return new CustomUserDetails(user);
+    }
     }
 
