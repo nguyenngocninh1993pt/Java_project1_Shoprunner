@@ -275,7 +275,7 @@ const Products = () => {
                             setTimeout(() => setActiveId(null), 1500);
                           }}
                         >
-                          <ShoppingCart size={18} />
+                          <ShoppingCart size={18} className="product-cart-icon"/>
                         </div>
                       </div>
 

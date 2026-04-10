@@ -27,12 +27,12 @@ import Profile from "./pages/Profile";
 
 // --- CÁC COMPONENT ADMIN ---
 // (Nhớ import đúng đường dẫn nơi bạn đã lưu các file này nhé)
-import AdminLayout from "./components/AdminLayout";
-import AdminDashboard from "./components/AdminDashboard";
+import AdminLayout from "./pages/Admin/AdminLayout";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserManagement from "./components/UserManagement";
-import AdminProducts from "./components/AdminProducts";
-import AdminOrders from "./components/AdminOrders";
-import AdminSettings from "./components/AdminSettings";
+import AdminProducts from "./pages/Admin/AdminProducts";
+import AdminOrders from "./pages/Admin/AdminOrders";
+import AdminSettings from "./pages/Admin/AdminSettings";
 
 // Tạo một Layout riêng cho trang khách hàng (Chứa Navbar và Footer)
 const StoreLayout = () => {

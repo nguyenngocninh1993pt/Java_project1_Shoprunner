@@ -47,7 +47,6 @@ const Profile = () => {
         const res = await axios.get(
           `http://localhost:8080/api/v1/orders/user/${user.id}`,
         );
-        console.log("ORDERS DATA:", JSON.stringify(res.data, null, 2)); // ← thêm
         setOrders(res.data);
       } catch (err) {
         console.log("LOAD ORDERS ERROR:", err);
