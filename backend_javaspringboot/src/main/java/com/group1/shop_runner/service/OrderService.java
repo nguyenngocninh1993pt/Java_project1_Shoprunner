@@ -69,9 +69,16 @@ public class OrderService {
         user.setId(request.getUserId());
 
         order.setUser(user);
-        order.setStatus(OrderStatus.PENDING);
+        String paymentMethod = request.getPaymentMethod();
+        if ("cod".equalsIgnoreCase(paymentMethod)) {
+            order.setStatus(OrderStatus.SHIP_COD);
+        } else {
+            // bank hoặc card → PAID
+            order.setStatus(OrderStatus.PAID);
+        }
         order.setShippingAddress(request.getShippingAddress());
         order.setPhoneNumber(request.getPhoneNumber());
+        order.setReceiverName(request.getReceiverName());
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         order.setTotalPrice(BigDecimal.ZERO);
@@ -176,7 +183,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (order.getStatus() != OrderStatus.PENDING) {
+        if (order.getStatus() != OrderStatus.PAID && order.getStatus() != OrderStatus.SHIP_COD) {
             throw new AppException(ErrorCode.INVALID_INPUT);
         }
 
@@ -196,7 +203,22 @@ public class OrderService {
         response.setStatus(order.getStatus());
         response.setShippingAddress(order.getShippingAddress());
         response.setPhoneNumber(order.getPhoneNumber());
+        response.setReceiverName(order.getReceiverName());
         response.setCreatedAt(order.getCreatedAt());
+        //san pham
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getId());
+        List<OrderItemResponse> itemResponses = orderItems.stream().map(item -> {
+            OrderItemResponse itemResponse = new OrderItemResponse();
+            itemResponse.setProductVariantId(Math.toIntExact(item.getProductVariant().getId()));
+            itemResponse.setQuantity(item.getQuantity());
+            itemResponse.setPrice(item.getPrice());
+            itemResponse.setProductName(
+                    item.getProductVariant().getProduct().getName()
+            );
+            return itemResponse;
+        }).toList();
+
+        response.setItems(itemResponses);
         return response;
     }
 
@@ -223,5 +245,15 @@ public class OrderService {
 
         response.setItems(items);
         return response;
+    }
+    //lay tat ca order
+    public List<OrderListResponse> getAllOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .map(order -> {
+                    OrderListResponse res = mapToOrderListResponse(order);
+                    return res;
+                })
+                .toList();
     }
 }

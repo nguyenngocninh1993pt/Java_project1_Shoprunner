@@ -134,6 +134,7 @@ public class ProductService {
         variant.setOption3Value(request.getOption3Value());
         variant.setPrice(request.getPrice());
         variant.setStock(request.getStock());
+        variant.setSku(request.getSku());
 
         ProductVariant savedVariant = productVariantRepository.save(variant);
 
@@ -177,6 +178,7 @@ public class ProductService {
         variant.setOption3Value(request.getOption3Value());
         variant.setPrice(request.getPrice());
         variant.setStock(request.getStock());
+        variant.setSku(request.getSku());
 
         ProductVariant updatedVariant = productVariantRepository.save(variant);
 
